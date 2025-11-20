@@ -1,71 +1,202 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <title>Sınav Çalışma Sitesi</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            padding: 20px;
-        }
-        .container {
-            max-width: 700px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-        h2 {
-            color: #333;
-        }
-        textarea {
-            width: 100%;
-            height: 80px;
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #aaa;
-            font-size: 16px;
-        }
-        .question {
-            margin-bottom: 25px;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>11. Sınıf Tarih Çalışma Kağıdı</title>
+<style>
+body { font-family: Arial; background:#f2f5ff; padding:20px; }
+h1 { text-align:center; color:#2c3e50; margin-bottom:20px; }
+.q { background:white; padding:15px; border-radius:10px; 
+     margin-bottom:12px; border-left:6px solid #4a6cf7;
+     box-shadow:0 2px 4px rgba(0,0,0,0.08); }
+button { padding:6px 10px; border-radius:6px;
+         border:1px solid #4a6cf7; background:white; 
+         cursor:pointer; color:#4a6cf7; margin-top:8px; }
+button:hover { background:#4a6cf7; color:white; }
+.a { display:none; margin-top:10px; color:#333; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Sınav Soruları – Cevaplarını Kendin Yaz</h1>
 
-        <div class="question">
-            <h2>Soru 1: Sağlık nedir?</h2>
-            <textarea placeholder="Cevabını buraya yaz..."></textarea>
-        </div>
+<h1>11. Sınıf Tarih Çalışma Kağıdı</h1>
 
-        <div class="question">
-            <h2>Soru 2: Engel türlerini yazınız.</h2>
-            <textarea placeholder="Cevabını buraya yaz..."></textarea>
-        </div>
+<div id="container">
+<div class='q'>
+<b>1- Kronolojik Sıra</b><br>
+<button onclick="toggle(0)">Cevabı Göster</button>
+<div class='a' id='a-0'>1596 Haçova → 1606 Zitvatorok → 1669 Girit → 1683 II. Viyana → 1699 Karlofça</div>
+</div>
 
-        <div class="question">
-            <h2>Soru 3: İnsan sağlığını etkileyen temel etmenler nelerdir?</h2>
-            <textarea placeholder="Cevabını buraya yaz..."></textarea>
-        </div>
+<div class='q'>
+<b>2- Bucaş’ın Önemi</b><br>
+<button onclick="toggle(1)">Cevabı Göster</button>
+<div class='a' id='a-1'>Osmanlı Devleti’nin Batıda en geniş sınırlara ulaştığı antlaşmadır.</div>
+</div>
 
-        <div class="question">
-            <h2>Soru 4: İnsan sağlığını olumsuz etkileyen çevresel etmenleri yazınız.</h2>
-            <textarea placeholder="Cevabını buraya yaz..."></textarea>
-        </div>
+<div class='q'>
+<b>3- Siyasi ilişki kurulan devletler</b><br>
+<button onclick="toggle(2)">Cevabı Göster</button>
+<div class='a' id='a-2'>Venedik - Avusturya - Rusya - İran - Lehistan (VARİL)</div>
+</div>
 
-        <div class="question">
-            <h2>Soru 5: Sağlık hizmetleri nelerdir?</h2>
-            <textarea placeholder="Cevabını buraya yaz..."></textarea>
-        </div>
+<div class='q'>
+<b>4- Osmanlı-İran antlaşmaları</b><br>
+<button onclick="toggle(3)">Cevabı Göster</button>
+<div class='a' id='a-3'>Ferhat Paşa, Nasuh Paşa, Serav, Kasrı Şirin</div>
+</div>
 
-        <p style="text-align:center; margin-top:30px; font-size:14px; color:#666;">
-            Hazırlayan: ChatGPT 😊
-        </p>
-    </div>
+<div class='q'>
+<b>5- Ferhat Paşa önemi</b><br>
+<button onclick="toggle(4)">Cevabı Göster</button>
+<div class='a' id='a-4'>Osmanlı Devletinin doğuda en geniş sınırlara ulaştığı antlaşmadır.</div>
+</div>
+
+<div class='q'>
+<b>6- Kasr-ı Şirin önemi</b><br>
+<button onclick="toggle(5)">Cevabı Göster</button>
+<div class='a' id='a-5'>Türkiye-İran sınırı ilk kez çizildi.</div>
+</div>
+
+<div class='q'>
+<b>7- Girit</b><br>
+<button onclick="toggle(6)">Cevabı Göster</button>
+<div class='a' id='a-6'>Venedik’ten alındı. Osmanlı'nın Akdeniz’de fethettiği son ada; en uzun deniz kuşatması (24 yıl).</div>
+</div>
+
+<div class='q'>
+<b>8- Kadırga → Kalyon geçişi sebebi</b><br>
+<button onclick="toggle(7)">Cevabı Göster</button>
+<div class='a' id='a-7'>Girit Kuşatması</div>
+</div>
+
+<div class='q'>
+<b>9- Osmanlı–Rusya ilk antlaşma</b><br>
+<button onclick="toggle(8)">Cevabı Göster</button>
+<div class='a' id='a-8'>Bahçesaray (Çehrin) Antlaşması (1681)</div>
+</div>
+
+<div class='q'>
+<b>10- Hotin’in önemi</b><br>
+<button onclick="toggle(9)">Cevabı Göster</button>
+<div class='a' id='a-9'>Lehistan ile yapılan ilk antlaşma; ordu bozulması; II. Osman’ın öldürülmesi.</div>
+</div>
+
+<div class='q'>
+<b>11- Haçova önemi</b><br>
+<button onclick="toggle(10)">Cevabı Göster</button>
+<div class='a' id='a-10'>Osmanlı’nın kazandığı son meydan savaşı.</div>
+</div>
+
+<div class='q'>
+<b>12- Zitvatorok maddeleri</b><br>
+<button onclick="toggle(11)">Cevabı Göster</button>
+<div class='a' id='a-11'>Osmanlı–Avusturya; Arşidük denk; kaleler; tazminat; diplomatik eşitlik.</div>
+</div>
+
+<div class='q'>
+<b>13- Zitvatorok önemi</b><br>
+<button onclick="toggle(12)">Cevabı Göster</button>
+<div class='a' id='a-12'>Osmanlı Avrupa’daki üstünlüğünü kaybetti.</div>
+</div>
+
+<div class='q'>
+<b>14- II. Viyana nedenleri</b><br>
+<button onclick="toggle(13)">Cevabı Göster</button>
+<div class='a' id='a-13'>Murat Giray sorumsuzluğu; güçlü surlar; Macarlara baskı.</div>
+</div>
+
+<div class='q'>
+<b>15- II. Viyana sonuçları</b><br>
+<button onclick="toggle(14)">Cevabı Göster</button>
+<div class='a' id='a-14'>Başarısızlık; Mustafa Paşa idamı; Avrupa birleşti.</div>
+</div>
+
+<div class='q'>
+<b>16- Kutsal İttifak</b><br>
+<button onclick="toggle(15)">Cevabı Göster</button>
+<div class='a' id='a-15'>Venedik - Avusturya - Rusya - Malta - Lehistan (VARML)</div>
+</div>
+
+<div class='q'>
+<b>17- Kutsal İttifak amacı</b><br>
+<button onclick="toggle(16)">Cevabı Göster</button>
+<div class='a' id='a-16'>Türkleri Avrupa’dan atmak.</div>
+</div>
+
+<div class='q'>
+<b>18- Karlofça tarafları</b><br>
+<button onclick="toggle(17)">Cevabı Göster</button>
+<div class='a' id='a-17'>Osmanlı, Avusturya, Lehistan, Venedik</div>
+</div>
+
+<div class='q'>
+<b>19- Karlofça önemi</b><br>
+<button onclick="toggle(18)">Cevabı Göster</button>
+<div class='a' id='a-18'>İlk büyük toprak kaybı; gerileme dönemi başladı.</div>
+</div>
+
+<div class='q'>
+<b>20- İstanbul 1700 maddeleri</b><br>
+<button onclick="toggle(19)">Cevabı Göster</button>
+<div class='a' id='a-19'>Ruslar elçi bulunduracak; Azak Kalesi Rusya’ya verildi.</div>
+</div>
+
+<div class='q'>
+<b>21- İstanbul 1700 önemi</b><br>
+<button onclick="toggle(20)">Cevabı Göster</button>
+<div class='a' id='a-20'>Karadeniz Türk Gölü olma özelliğini kaybetti.</div>
+</div>
+
+<div class='q'>
+<b>22- XVII. yy isyanları</b><br>
+<button onclick="toggle(21)">Cevabı Göster</button>
+<div class='a' id='a-21'>Yeniçeri, Celali, Eyalet, Suhte isyanları.</div>
+</div>
+
+<div class='q'>
+<b>23- Celali nedenleri</b><br>
+<button onclick="toggle(22)">Cevabı Göster</button>
+<div class='a' id='a-22'>Merkezi otorite bozulması; ekonomi sorunları; timar bozulması.</div>
+</div>
+
+<div class='q'>
+<b>24- Celali sonuçları</b><br>
+<button onclick="toggle(23)">Cevabı Göster</button>
+<div class='a' id='a-23'>Huzur bozuldu; üretim düştü; göç arttı.</div>
+</div>
+
+<div class='q'>
+<b>25- İsyanların ortak özellikleri</b><br>
+<button onclick="toggle(24)">Cevabı Göster</button>
+<div class='a' id='a-24'>Siyasi–ekonomik nedenler; bağımsızlık amacı yok.</div>
+</div>
+
+<div class='q'>
+<b>26- Tarhuncu Ahmet Paşa ıslahatları</b><br>
+<button onclick="toggle(25)">Cevabı Göster</button>
+<div class='a' id='a-25'>İlk bütçe; saray harcamaları kısıldı.</div>
+</div>
+
+<div class='q'>
+<b>27- II. Osman ıslahatları</b><br>
+<button onclick="toggle(26)">Cevabı Göster</button>
+<div class='a' id='a-26'>Saray dışından evlilik; yeniçeri ocağını kaldırma düşüncesi.</div>
+</div>
+
+<div class='q'>
+<b>28- Sancağa çıkma sistemi</b><br>
+<button onclick="toggle(27)">Cevabı Göster</button>
+<div class='a' id='a-27'>Şehzadelere yönetim ve askerlik eğitimi.</div>
+</div>
+
+</div>
+
+<script>
+function toggle(i){
+  let el=document.getElementById("a-"+i);
+  el.style.display = el.style.display==="block" ? "none" : "block";
+}
+</script>
+
 </body>
 </html>

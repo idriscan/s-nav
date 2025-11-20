@@ -7,57 +7,66 @@
   <title>Sağlık Çalışma Sayfası — İnteraktif (HTML)</title>
   <style>
     :root{
-      --bg1: #fffbeb; /* soft warm */
+      --bg1: #fffbeb;
       --card: #ffffff;
-      --accent1: #7c3aed; /* indigo */
-      --accent2: #ec4899; /* pink */
+      --accent1: #7c3aed;
+      --accent2: #ec4899;
       --muted:#6b7280;
-      --glass: rgba(255,255,255,0.6);
+      --text:#111827;
+    }
+    body.dark{
+      --bg1:#0f172a;
+      --card:#1e293b;
+      --text:#f1f5f9;
+      --muted:#94a3b8;
     }
     *{box-sizing:border-box}
     body{
-      margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: linear-gradient(135deg,#fef3c7 0%, #ede9fe 45%, #fff1f2 100%);
-      -webkit-font-smoothing:antialiased; color:#111827;
-      padding:28px;display:flex;align-items:center;justify-content:center;min-height:100vh
+      margin:0;font-family:Inter, ui-sans-serif, system-ui;
+      background: linear-gradient(135deg,var(--bg1) 0%, #1e1b4b 45%, #3b0d25 100%);
+      padding:28px;display:flex;align-items:center;justify-content:center;min-height:100vh;
+      color:var(--text);
+      transition:background .3s,color .3s;
     }
-    .wrap{width:100%;max-width:980px}.card{
-  background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
-  border-radius:18px;padding:22px;box-shadow:0 12px 40px rgba(15,23,42,0.12);
-  backdrop-filter: blur(6px);
-}
-header h1{margin:0;font-size:20px;letter-spacing:-0.4px}
-header p{margin:6px 0 18px;color:var(--muted)}
-
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    .wrap{width:100%;max-width:980px}
+    .card{
+      background:linear-gradient(180deg, var(--card), var(--card));
+      border-radius:18px;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,0.25);
+      backdrop-filter: blur(6px);
+      transition:.25s;
+    }
+    header h1{margin:0;font-size:20px;letter-spacing:-0.4px}
+    header p{margin:6px 0 18px;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
 @media (max-width:760px){.grid{grid-template-columns:1fr}}
 
 .qa{
-  background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(15,23,42,0.04);
+  background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);
   cursor:pointer;transition:transform .18s ease, box-shadow .18s ease;
 }
-.qa:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(16,24,40,0.06)}
+body.dark .qa{border-color:rgba(255,255,255,0.05)}
+.qa:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,0.15)}
 .qtop{display:flex;align-items:center;justify-content:space-between}
 .qtext{font-weight:600}
 .hint{font-size:12px;color:var(--muted);margin-top:6px}
 
-.answer{margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fbfbff, #ffffff);border:1px solid rgba(124,58,237,0.08);display:none;white-space:pre-wrap}
+.answer{margin-top:12px;padding:12px;border-radius:10px;background:var(--card);
+  border:1px solid rgba(124,58,237,0.18);display:none;white-space:pre-wrap}
 .open .answer{display:block}
 
 .badge{
-  display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;color:white;background:linear-gradient(90deg,var(--accent1),var(--accent2));
+  display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;color:white;
+  background:linear-gradient(90deg,var(--accent1),var(--accent2));
 }
 
 .controls{display:flex;gap:8px;align-items:center;margin-top:14px}
-.btn{padding:8px 12px;border-radius:10px;border:none;font-weight:600;cursor:pointer}
-.btn-ghost{background:transparent;border:1px solid rgba(15,23,42,0.06)}
+.btn{padding:8px 12px;border-radius:10px;border:none;font-weight:600;cursor:pointer;transition:.25s}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.2);color:var(--text)}
 .btn-primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white}
 
-footer{display:flex;justify-content:space-between;align-items:center;margin-top:16px;color:var(--muted);font-size:13px}
+.theme-toggle{margin-left:8px;background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,0.2)}
+body.dark .theme-toggle{background:#334155;color:#f1f5f9}
 
-/* little flair */
-.decor{position:relative}
-.decor::after{content:'';position:absolute;right:-20px;top:-20px;width:160px;height:160px;background:radial-gradient(circle at 30% 30%, rgba(236,72,153,0.08), transparent 30%), radial-gradient(circle at 70% 70%, rgba(124,58,237,0.06), transparent 30%);border-radius:50%}
+footer{display:flex;justify-content:space-between;align-items:center;margin-top:16px;color:var(--muted);font-size:13px}
 
   </style>
 </head>
@@ -66,11 +75,12 @@ footer{display:flex;justify-content:space-between;align-items:center;margin-top:
     <div class="card decor">
       <header>
         <h1>Sağlık Çalışma Sayfası</h1>
-        <p>Sorulara tıklayarak cevapları aç. İstersen yazdır veya tümünü genişlet.</p>
+        <p>Sorulara tıklayarak cevapları aç. Tema değiştirebilir, yazdırabilir veya tümünü açabilirsin.</p>
       </header><div class="controls">
     <button id="expandAll" class="btn btn-ghost">Tümünü Aç</button>
     <button id="collapseAll" class="btn btn-ghost">Tümünü Kapat</button>
     <button id="printBtn" class="btn btn-primary">Yazdır</button>
+    <button id="themeBtn" class="btn theme-toggle">🌙 / ☀️</button>
     <div style="flex:1"></div>
     <span class="badge">11. Sınıf</span>
   </div>
@@ -148,36 +158,37 @@ footer{display:flex;justify-content:space-between;align-items:center;margin-top:
 
 3. Rehabilitasyon hizmetleri</div> </div>
 
+  </div>
+
+   </main>
+ </div>
+
   </div>  <script>
     const list = document.getElementById('list');
     const items = Array.from(list.querySelectorAll('.qa'));
 
     items.forEach(it => {
-      it.addEventListener('click', e => {
-        // toggle
+      it.addEventListener('click', () => {
         const open = it.classList.toggle('open');
-        const meta = it.querySelector('.meta');
-        meta.textContent = open ? '▼' : '►';
+        it.querySelector('.meta').textContent = open ? '▼' : '►';
       });
-    });
-
-    document.getElementById('expandAll').addEventListener('click', () => {
-      items.forEach(it => { it.classList.add('open'); it.querySelector('.meta').textContent = '▼'; });
-    });
-    document.getElementById('collapseAll').addEventListener('click', () => {
-      items.forEach(it => { it.classList.remove('open'); it.querySelector('.meta').textContent = '►'; });
-    });
-
-    document.getElementById('printBtn').addEventListener('click', () => {
-      window.print();
-    });
-
-    // keyboard accessibility: Enter/Space to toggle when focused
-    items.forEach(it=>{
       it.tabIndex = 0;
       it.addEventListener('keydown', ev => {
         if(ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); it.click(); }
       });
     });
+
+    document.getElementById('expandAll').onclick = () => {
+      items.forEach(it => { it.classList.add('open'); it.querySelector('.meta').textContent = '▼'; });
+    };
+    document.getElementById('collapseAll').onclick = () => {
+      items.forEach(it => { it.classList.remove('open'); it.querySelector('.meta').textContent = '►'; });
+    };
+    document.getElementById('printBtn').onclick = () => window.print();
+
+    const themeBtn = document.getElementById('themeBtn');
+    themeBtn.onclick = () => {
+      document.body.classList.toggle('dark');
+    };
   </script></body>
 </html>

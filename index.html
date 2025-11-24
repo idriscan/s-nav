@@ -4,191 +4,123 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sağlık Çalışma Sayfası — İnteraktif (HTML)</title>
+  <title>Tıklayın — Anında Metin</title>
   <style>
-    :root{
-      --bg1: #fffbeb;
-      --card: #ffffff;
-      --accent1: #7c3aed;
-      --accent2: #ec4899;
-      --muted:#6b7280;
-      --text:#111827;
-    }
-    body.dark{
-      --bg1:#0f172a;
-      --card:#1e293b;
-      --text:#f1f5f9;
-      --muted:#94a3b8;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;font-family:Inter, ui-sans-serif, system-ui;
-      background: linear-gradient(135deg,var(--bg1) 0%, #1e1b4b 45%, #3b0d25 100%);
-      padding:28px;display:flex;align-items:center;justify-content:center;min-height:100vh;
-      color:var(--text);
-      transition:background .3s,color .3s;
-    }
-    .wrap{width:100%;max-width:980px}
-    .card{
-      background:linear-gradient(180deg, var(--card), var(--card));
-      border-radius:18px;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,0.25);
-      backdrop-filter: blur(6px);
-      transition:.25s;
-    }
-    header h1{margin:0;font-size:20px;letter-spacing:-0.4px}
-    header p{margin:6px 0 18px;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-@media (max-width:760px){.grid{grid-template-columns:1fr}}
-
-.qa{
-  background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);
-  cursor:pointer;transition:transform .18s ease, box-shadow .18s ease;
-}
-body.dark .qa{border-color:rgba(255,255,255,0.05)}
-.qa:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,0.15)}
-.qtop{display:flex;align-items:center;justify-content:space-between}
-.qtext{font-weight:600}
-.hint{font-size:12px;color:var(--muted);margin-top:6px}
-
-.answer{margin-top:12px;padding:12px;border-radius:10px;background:var(--card);
-  border:1px solid rgba(124,58,237,0.18);display:none;white-space:pre-wrap}
-.open .answer{display:block}
-
-.badge{
-  display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;color:white;
-  background:linear-gradient(90deg,var(--accent1),var(--accent2));
-}
-
-.controls{display:flex;gap:8px;align-items:center;margin-top:14px}
-.btn{padding:8px 12px;border-radius:10px;border:none;font-weight:600;cursor:pointer;transition:.25s}
-.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.2);color:var(--text)}
-.btn-primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white}
-
-.theme-toggle{margin-left:8px;background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,0.2)}
-body.dark .theme-toggle{background:#334155;color:#f1f5f9}
-
-footer{display:flex;justify-content:space-between;align-items:center;margin-top:16px;color:var(--muted);font-size:13px}
-
+    :root{ --bg:#0f172a; --card:#0b1220; --text:#e6eef8; --muted:#9fb0c8 }
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{background:linear-gradient(180deg,#071022 0%, #0b1730 100%);color:var(--text);display:grid;place-items:center}
+    .app{width:960px;max-width:94%;background:rgba(255,255,255,0.02);padding:24px;border-radius:14px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    h1{font-size:20px;margin:0}
+    .controls{display:flex;gap:8px;align-items:center}
+    input[type=text]{padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);min-width:220px}
+    button{padding:10px 12px;border-radius:8px;border:none;background:rgba(255,255,255,0.06);color:var(--text);cursor:pointer}
+    .stage{position:relative;margin-top:18px;height:480px;border-radius:10px;overflow:hidden;border:1px dashed rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center}
+    .hint{position:absolute;top:12px;left:12px;color:var(--muted);font-size:13px}
+    .floating-text{position:absolute;pointer-events:none;font-weight:700;user-select:none;transform:translate(-50%,-50%);white-space:nowrap;padding:6px 10px;border-radius:999px;font-size:16px}
+    @keyframes popAway{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-120%) scale(1.4);opacity:0}}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card decor">
-      <header>
-        <h1>Sağlık Çalışma Sayfası</h1>
-        <p>Sorulara tıklayarak cevapları aç. Tema değiştirebilir, yazdırabilir veya tümünü açabilirsin.</p>
-      </header><div class="controls">
-    <button id="expandAll" class="btn btn-ghost">Tümünü Aç</button>
-    <button id="collapseAll" class="btn btn-ghost">Tümünü Kapat</button>
-    <button id="printBtn" class="btn btn-primary">Yazdır</button>
-    <button id="themeBtn" class="btn theme-toggle">🌙 / ☀️</button>
-    <div style="flex:1"></div>
-    <span class="badge">11. Sınıf</span>
-  </div>
-
-  <main style="margin-top:14px">
-    <div class="grid" id="list">
-
-      <div class="qa" data-index="0">
-        <div class="qtop">
-          <div>
-            <div class="qtext">1. Soru — Sağlık nedir? Tanımlayınız.</div>
-            <div class="hint">Tıkla ve cevabı gör</div>
-          </div>
-          <div class="meta">►</div>
-        </div>
-        <div class="answer">Yalnızca hasta ve engelli olmayış değil; bedenen, zihnen, ruhsal ve sosyal yönden iyilik hâlidir.</div>
+  <div class="app">
+    <header>
+      <h1>Tıkla — Metin Görünsün</h1>
+      <div class="controls">
+        <!-- You can edit the default text here in the input or change it directly in the JavaScript variable `defaultText` -->
+        <input id="textInput" type="text" value="seni seviyorum" aria-label="Gösterilecek metin" />
+        <button id="clearBtn">Temizle</button>
       </div>
+    </header><div id="stage" class="stage" tabindex="0">
+  <div class="hint">Ekrana tıkla — tıkladığın yere metin çıkacak. (Mobil dokun)</div>
+</div>
 
-      <div class="qa" data-index="1">
-        <div class="qtop">
-          <div>
-            <div class="qtext">2. Soru — Engel türlerini yazınız.</div>
-            <div class="hint">Tıkla ve cevabı gör</div>
-          </div>
-          <div class="meta">►</div>
-        </div>
-        <div class="answer">1. Görme engelli
-
-2. İşitsel engel
-
-3. Spastik engel
-
-4. Fiziksel engel
-
-5. Zihinsel engel
-
-6. Dil ve konuşma engeli</div> </div>
-
-<div class="qa" data-index="2">
-     <div class="qtop">
-       <div>
-         <div class="qtext">3. Soru — İnsan sağlığını etkileyen temel etmenler yazınız.</div>
-         <div class="hint">Tıkla ve cevabı gör</div>
-       </div>
-       <div class="meta">►</div>
-     </div>
-     <div class="answer">1. Çevresel etmenler
-
-2. Genetik etmenler
-
-3. Sağlık hizmetlerine erişim şekli ve sosyoekonomik durum</div> </div>
-
-<div class="qa" data-index="3">
-     <div class="qtop">
-       <div>
-         <div class="qtext">4. Soru — İnsan sağlığını etkileyen çevresel etmenleri yazınız.</div>
-         <div class="hint">Tıkla ve cevabı gör</div>
-       </div>
-       <div class="meta">►</div>
-     </div>
-     <div class="answer">Biyolojik, fiziksel ve kimyasal etmenler</div>
-   </div>
-
-   <div class="qa" data-index="4">
-     <div class="qtop">
-       <div>
-         <div class="qtext">5. Soru — Sağlık hizmetleri nelerdir? Yazınız.</div>
-         <div class="hint">Tıkla ve cevabı gör</div>
-       </div>
-       <div class="meta">►</div>
-     </div>
-     <div class="answer">1. Koruyucu
-
-2. Tedavi edici
-
-3. Rehabilitasyon hizmetleri</div> </div>
-
-  </div>
-
-   </main>
- </div>
+<p style="margin-top:12px;color:var(--muted);font-size:13px">Not: Yardımcı olması için bu sayfada gösterilecek metni üstteki kutudan canlı olarak değiştirebilirsin.</p>
 
   </div>  <script>
-    const list = document.getElementById('list');
-    const items = Array.from(list.querySelectorAll('.qa'));
+    // SAFETY: I will not insert or promote hateful/harassing content that targets protected groups.
+    // This page lets *you* choose the text to display live. The default text is a friendly placeholder.
 
-    items.forEach(it => {
-      it.addEventListener('click', () => {
-        const open = it.classList.toggle('open');
-        it.querySelector('.meta').textContent = open ? '▼' : '►';
+    const stage = document.getElementById('stage');
+    const input = document.getElementById('textInput');
+    const clearBtn = document.getElementById('clearBtn');
+
+    // If you want to set a different default, edit the string below.
+    let defaultText = input.value || 'seni seviyorum';
+
+    // Helper: create a floating element at the click position
+    function spawnText(x, y, text){
+      const el = document.createElement('div');
+      el.className = 'floating-text';
+      el.textContent = text;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+
+      // Random small tilt and scale for variety
+      const rot = (Math.random() - 0.5) * 14; // -7..7 deg
+      const scale = 1 + Math.random() * 0.08;
+      el.style.transform = `translate(-50%,-50%) rotate(${rot}deg) scale(${scale})`;
+
+      // Subtle color palette (keeps contrast readable)
+      const hues = [220, 190, 170, 205, 230];
+      const hue = hues[Math.floor(Math.random()*hues.length)];
+      el.style.color = `hsl(${hue}deg 80% 88%)`;
+
+      stage.appendChild(el);
+
+      // Animate and remove after animation ends
+      requestAnimationFrame(()=>{
+        el.style.transition = 'transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms';
+        el.style.transform = `translate(-50%,-120%) rotate(${rot}deg) scale(${scale*1.25})`;
+        el.style.opacity = '0';
       });
-      it.tabIndex = 0;
-      it.addEventListener('keydown', ev => {
-        if(ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); it.click(); }
-      });
+
+      setTimeout(()=> el.remove(), 1000);
+    }
+
+    // Click / touch handler
+    function handlePointer(e){
+      // Determine coordinates relative to the stage
+      const rect = stage.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      let text = input.value.trim();
+      if(!text) text = defaultText;
+
+      // Basic safety check: refuse to display explicitly hateful slurs that target protected groups.
+      const lowered = text.toLowerCase();
+      const hatefulWords = ['siktir', 'orospu', 'ibne', 'mal', 'fuck', 'bitch']; // minimal filter for common slurs
+      if(hatefulWords.some(w => lowered.includes(w))){
+        spawnText(x, y, 'metin uygun değil');
+        return;
+      }
+
+      spawnText(x, y, text);
+    }
+
+    // Support clicks and touches
+    stage.addEventListener('click', handlePointer);
+    stage.addEventListener('touchstart', (e)=>{ e.preventDefault(); handlePointer(e); }, {passive:false});
+
+    // Clear button to remove all floating texts
+    clearBtn.addEventListener('click', ()=>{
+      defaultText = '';
+      input.value = '';
+      // remove any leftover floating nodes
+      stage.querySelectorAll('.floating-text').forEach(n=>n.remove());
     });
 
-    document.getElementById('expandAll').onclick = () => {
-      items.forEach(it => { it.classList.add('open'); it.querySelector('.meta').textContent = '▼'; });
-    };
-    document.getElementById('collapseAll').onclick = () => {
-      items.forEach(it => { it.classList.remove('open'); it.querySelector('.meta').textContent = '►'; });
-    };
-    document.getElementById('printBtn').onclick = () => window.print();
+    // Keyboard: spacebar will spawn text at center (useful for desktop testing)
+    document.addEventListener('keydown', (e)=>{
+      if(e.code === 'Space'){
+        const rect = stage.getBoundingClientRect();
+        spawnText(rect.width/2, rect.height/2, input.value.trim() || defaultText);
+      }
+    });
 
-    const themeBtn = document.getElementById('themeBtn');
-    themeBtn.onclick = () => {
-      document.body.classList.toggle('dark');
-    };
+    // Focus stage for keyboard
+    stage.addEventListener('keydown', ()=>{});
   </script></body>
 </html>

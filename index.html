@@ -1,126 +1,481 @@
 <!doctype html>
-
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tıklayın — Anında Metin</title>
+  <title>Sağlık Çalışma Sayfası — İnteraktif</title>
+  <meta name="description" content="Sağlık konuları — karanlık/aydınlık tema, yavaş animasyonlu interaktif sayfa.">
   <style>
-    :root{ --bg:#0f172a; --card:#0b1220; --text:#e6eef8; --muted:#9fb0c8 }
-    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
-    body{background:linear-gradient(180deg,#071022 0%, #0b1730 100%);color:var(--text);display:grid;place-items:center}
-    .app{width:960px;max-width:94%;background:rgba(255,255,255,0.02);padding:24px;border-radius:14px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
-    header{display:flex;gap:12px;align-items:center;justify-content:space-between}
-    h1{font-size:20px;margin:0}
-    .controls{display:flex;gap:8px;align-items:center}
-    input[type=text]{padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);min-width:220px}
-    button{padding:10px 12px;border-radius:8px;border:none;background:rgba(255,255,255,0.06);color:var(--text);cursor:pointer}
-    .stage{position:relative;margin-top:18px;height:480px;border-radius:10px;overflow:hidden;border:1px dashed rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center}
-    .hint{position:absolute;top:12px;left:12px;color:var(--muted);font-size:13px}
-    .floating-text{position:absolute;pointer-events:none;font-weight:700;user-select:none;transform:translate(-50%,-50%);white-space:nowrap;padding:6px 10px;border-radius:999px;font-size:16px}
-    @keyframes popAway{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-120%) scale(1.4);opacity:0}}
+    /* --- Temel değişkenler (light / dark için üzerine yazılıyor) --- */
+    :root{
+      --bg: #fffbf7;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #7c3aed;
+      --accent-2: #06b6d4;
+      --glass: rgba(255,255,255,0.6);
+      --shadow: 0 8px 24px rgba(16,24,40,0.06);
+      --radius: 14px;
+      --transition-fast: 280ms cubic-bezier(.2,.9,.2,1);
+      --transition-slow: 700ms cubic-bezier(.18,.77,.32,1); /* tatlı ve yavaş */
+      --focus-ring: 3px;
+    }
+
+    [data-theme="dark"]{
+      --bg: #0b1020;
+      --card: rgba(9,12,20,0.7);
+      --text: #eef2ff;
+      --muted: #9aa4bf;
+      --accent: #9f7aea;
+      --accent-2: #34d3e0;
+      --glass: rgba(255,255,255,0.03);
+      --shadow: 0 10px 30px rgba(2,6,23,0.6);
+    }
+
+    /* --- Genel sayfa --- */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.06), transparent),
+                  radial-gradient(900px 500px at 90% 90%, rgba(6,182,212,0.04), transparent),
+                  var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:32px;
+      transition: background var(--transition-slow), color var(--transition-slow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .container{
+      width:100%;
+      max-width:900px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+      backdrop-filter: blur(6px) saturate(120%);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      transition: background var(--transition-slow), box-shadow var(--transition-slow);
+    }
+
+    [data-theme="dark"] .container{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    }
+
+    header{
+      display:flex;
+      gap:16px;
+      align-items:center;
+      justify-content:space-between;
+      padding:28px 32px;
+    }
+
+    .brand{
+      display:flex;
+      gap:14px;
+      align-items:center;
+    }
+
+    .logo{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-weight:700;
+      font-size:20px;
+      box-shadow:0 6px 20px rgba(124,58,237,0.18);
+      transition:transform var(--transition-slow);
+    }
+    .logo:active{ transform: scale(0.98) }
+
+    h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing: -0.2px;
+    }
+    p.lead{ margin:4px 0 0 0; color:var(--muted); font-size:13px }
+
+    /* --- Kontroller --- */
+    .controls{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .btn{
+      border:0;
+      background:var(--card);
+      padding:8px 12px;
+      border-radius:12px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+      cursor:pointer;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-slow);
+      font-weight:600;
+      color:var(--text);
+    }
+    .btn:focus{ outline: none; box-shadow: 0 0 0 var(--focus-ring) rgba(124,58,237,0.12) }
+
+    .toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:6px;
+    }
+    .switch{
+      width:46px;
+      height:28px;
+      background:var(--glass);
+      border-radius:999px;
+      position:relative;
+      padding:4px;
+      cursor:pointer;
+      transition: background var(--transition-slow);
+    }
+    .knob{
+      width:20px;
+      height:20px;
+      background:linear-gradient(180deg,white,rgba(255,255,255,0.9));
+      border-radius:50%;
+      box-shadow:0 6px 14px rgba(2,6,23,0.12);
+      transform: translateX(0);
+      transition: transform var(--transition-slow), background var(--transition-slow);
+    }
+    [data-theme="dark"] .knob{
+      background:linear-gradient(180deg,#111,#1b1f2a);
+    }
+    .switch.on{ background: linear-gradient(90deg,var(--accent),var(--accent-2)); }
+    .switch.on .knob{ transform: translateX(18px) }
+
+    /* --- İçerik alanı --- */
+    main{
+      padding:18px 32px 36px 32px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+    }
+
+    .card{
+      background: linear-gradient(180deg,var(--card), rgba(255,255,255,0.02));
+      border-radius:12px;
+      padding:14px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.04);
+      transition: transform var(--transition-slow), box-shadow var(--transition-slow);
+      overflow:visible;
+    }
+    .card header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+    .qnum{
+      display:inline-grid;
+      place-items:center;
+      width:44px;
+      height:44px;
+      border-radius:10px;
+      background:linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.02));
+      color:var(--text);
+      font-weight:700;
+      font-size:15px;
+    }
+
+    .question-title{ margin:0; font-size:15px; font-weight:700 }
+    .muted{ color:var(--muted); font-size:13px; margin-top:6px }
+
+    /* --- Akordeon (cevap) --- */
+    .answer{
+      margin-top:12px;
+      height:0;
+      overflow:hidden;
+      transition: height var(--transition-slow) ease;
+    }
+    .answer.open{
+      height:auto; /* fallback; we will set explicit height in JS for smoothness */
+    }
+    .answer-inner{
+      padding:12px 8px;
+      border-radius:10px;
+      background: linear-gradient(180deg, rgba(124,58,237,0.04), rgba(6,182,212,0.02));
+      color:var(--text);
+      font-size:15px;
+      line-height:1.5;
+      transition: opacity var(--transition-slow);
+    }
+
+    /* küçük ekranlarda biraz daralt */
+    @media (max-width:560px){
+      body{ padding:16px }
+      .container{ border-radius:12px }
+      header{ padding:20px }
+      main{ padding:16px }
+    }
+
+    /* tatlı hover efektleri */
+    .card:hover{ transform: translateY(-6px) }
+    .card:active{ transform: translateY(-2px) }
+
+    /* küçük not */
+    .footer-note{
+      font-size:13px;
+      color:var(--muted);
+      text-align:center;
+      padding:12px 18px;
+    }
+
   </style>
 </head>
 <body>
-  <div class="app">
+  <div class="container" id="app">
     <header>
-      <h1>Tıkla — Metin Görünsün</h1>
-      <div class="controls">
-        <!-- You can edit the default text here in the input or change it directly in the JavaScript variable `defaultText` -->
-        <input id="textInput" type="text" value="seni seviyorum" aria-label="Gösterilecek metin" />
-        <button id="clearBtn">Temizle</button>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">SÇ</div>
+        <div>
+          <h1>SAĞLIK ÇALIŞMA SAYFASI</h1>
+          <p class="lead">Sorular + kısa cevaplar — interaktif, karanlık/aydınlık tema</p>
+        </div>
       </div>
-    </header><div id="stage" class="stage" tabindex="0">
-  <div class="hint">Ekrana tıkla — tıkladığın yere metin çıkacak. (Mobil dokun)</div>
-</div>
 
-<p style="margin-top:12px;color:var(--muted);font-size:13px">Not: Yardımcı olması için bu sayfada gösterilecek metni üstteki kutudan canlı olarak değiştirebilirsin.</p>
+      <div class="controls" role="group" aria-label="Tema ve kontrol düğmeleri">
+        <button class="btn" id="expandAll" title="Tümünü Aç / Kapat">Tümünü Aç/Kapat</button>
 
-  </div>  <script>
-    // SAFETY: I will not insert or promote hateful/harassing content that targets protected groups.
-    // This page lets *you* choose the text to display live. The default text is a friendly placeholder.
+        <div class="toggle" aria-hidden="false">
+          <span class="sr-only" style="position:absolute;left:-9999px">Tema</span>
+          <div id="themeSwitch" class="switch" role="switch" tabindex="0" aria-checked="false" aria-label="Karanlık temayı aç veya kapat">
+            <div class="knob"></div>
+          </div>
+        </div>
+      </div>
+    </header>
 
-    const stage = document.getElementById('stage');
-    const input = document.getElementById('textInput');
-    const clearBtn = document.getElementById('clearBtn');
+    <main>
+      <div class="grid" id="qaList">
+        <!-- Q1 -->
+        <article class="card">
+          <header>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div class="qnum">1</div>
+              <div>
+                <p class="question-title">1. Soru — Sağlık nedir? Tanımlayınız.</p>
+                <p class="muted">Cevap (kısa):</p>
+              </div>
+            </div>
+            <button class="btn toggleAnswer" aria-expanded="false" aria-controls="a1">Göster</button>
+          </header>
 
-    // If you want to set a different default, edit the string below.
-    let defaultText = input.value || 'seni seviyorum';
+          <div id="a1" class="answer" aria-hidden="true">
+            <div class="answer-inner">
+              Yalnızca hasta ve engelli olmama hâli değildir; <strong>bedenen, zihnen, ruhsal ve sosyal yönden iyilik durumudur.</strong>
+            </div>
+          </div>
+        </article>
 
-    // Helper: create a floating element at the click position
-    function spawnText(x, y, text){
-      const el = document.createElement('div');
-      el.className = 'floating-text';
-      el.textContent = text;
-      el.style.left = x + 'px';
-      el.style.top = y + 'px';
+        <!-- Q2 -->
+        <article class="card">
+          <header>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div class="qnum">2</div>
+              <div>
+                <p class="question-title">2. Soru — Engel türlerini yazınız.</p>
+                <p class="muted">Cevap (liste):</p>
+              </div>
+            </div>
+            <button class="btn toggleAnswer" aria-expanded="false" aria-controls="a2">Göster</button>
+          </header>
 
-      // Random small tilt and scale for variety
-      const rot = (Math.random() - 0.5) * 14; // -7..7 deg
-      const scale = 1 + Math.random() * 0.08;
-      el.style.transform = `translate(-50%,-50%) rotate(${rot}deg) scale(${scale})`;
+          <div id="a2" class="answer" aria-hidden="true">
+            <div class="answer-inner">
+              1. Görme engeli<br>
+              2. İşitsel engel<br>
+              3. Spastik engel<br>
+              4. Fiziksel engel<br>
+              5. Zihinsel engel<br>
+              6. Dil ve konuşma engeli
+            </div>
+          </div>
+        </article>
 
-      // Subtle color palette (keeps contrast readable)
-      const hues = [220, 190, 170, 205, 230];
-      const hue = hues[Math.floor(Math.random()*hues.length)];
-      el.style.color = `hsl(${hue}deg 80% 88%)`;
+        <!-- Q3 -->
+        <article class="card">
+          <header>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div class="qnum">3</div>
+              <div>
+                <p class="question-title">3. Soru — İnsan sağlığını etkileyen temel etmenler yazınız.</p>
+                <p class="muted">Cevap (liste):</p>
+              </div>
+            </div>
+            <button class="btn toggleAnswer" aria-expanded="false" aria-controls="a3">Göster</button>
+          </header>
 
-      stage.appendChild(el);
+          <div id="a3" class="answer" aria-hidden="true">
+            <div class="answer-inner">
+              1. Çevresel etmenler<br>
+              2. Genetik etmenler<br>
+              3. Sağlık hizmetleri<br>
+              4. Yaşam şekli ve sosyoekonomik durum
+            </div>
+          </div>
+        </article>
 
-      // Animate and remove after animation ends
-      requestAnimationFrame(()=>{
-        el.style.transition = 'transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms';
-        el.style.transform = `translate(-50%,-120%) rotate(${rot}deg) scale(${scale*1.25})`;
-        el.style.opacity = '0';
+        <!-- Q4 -->
+        <article class="card">
+          <header>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div class="qnum">4</div>
+              <div>
+                <p class="question-title">4. Soru — İnsan sağlığını etkileyen çevresel etmenleri yazınız.</p>
+                <p class="muted">Cevap (kısa):</p>
+              </div>
+            </div>
+            <button class="btn toggleAnswer" aria-expanded="false" aria-controls="a4">Göster</button>
+          </header>
+
+          <div id="a4" class="answer" aria-hidden="true">
+            <div class="answer-inner">
+              Biyolojik, fiziksel ve kimyasal etmenler.
+            </div>
+          </div>
+        </article>
+
+        <!-- Q5 -->
+        <article class="card">
+          <header>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div class="qnum">5</div>
+              <div>
+                <p class="question-title">5. Soru — Sağlık hizmetleri nelerdir?</p>
+                <p class="muted">Cevap (sınıflama):</p>
+              </div>
+            </div>
+            <button class="btn toggleAnswer" aria-expanded="false" aria-controls="a5">Göster</button>
+          </header>
+
+          <div id="a5" class="answer" aria-hidden="true">
+            <div class="answer-inner">
+              1. Koruyucu sağlık hizmetleri<br>
+              2. Tedavi edici sağlık hizmetleri<br>
+              3. Rehabilitasyon sağlık hizmetleri
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </main>
+
+    <div class="footer-note">
+      İstersen bu dosyayı kaydet ve öğretmene göster — tema tarayıcıya kaydedilir.
+    </div>
+  </div>
+
+  <script>
+    /* --- Tema yönetimi --- */
+    (function(){
+      const root = document.documentElement;
+      const app = document.getElementById('app');
+      const switchEl = document.getElementById('themeSwitch');
+      const KNOB_CLASS_ON = 'on';
+
+      // Başlangıç: localStorage veya tercih
+      const saved = localStorage.getItem('saglik_theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const initialDark = saved ? (saved === 'dark') : prefersDark;
+
+      function setTheme(dark){
+        if(dark){
+          root.setAttribute('data-theme','dark');
+          switchEl.classList.add(KNOB_CLASS_ON);
+          switchEl.setAttribute('aria-checked','true');
+        }else{
+          root.removeAttribute('data-theme');
+          switchEl.classList.remove(KNOB_CLASS_ON);
+          switchEl.setAttribute('aria-checked','false');
+        }
+        localStorage.setItem('saglik_theme', dark ? 'dark' : 'light');
+      }
+
+      setTheme(initialDark);
+
+      // tıklama / klavye ile kontrol
+      switchEl.addEventListener('click', ()=> setTheme(!root.hasAttribute('data-theme')));
+      switchEl.addEventListener('keydown', (e)=> {
+        if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTheme(!root.hasAttribute('data-theme')); }
       });
 
-      setTimeout(()=> el.remove(), 1000);
-    }
+      // Expand / collapse her bir akordeon
+      const toggles = Array.from(document.querySelectorAll('.toggleAnswer'));
+      toggles.forEach(btn => {
+        const targetId = btn.getAttribute('aria-controls');
+        const panel = document.getElementById(targetId);
 
-    // Click / touch handler
-    function handlePointer(e){
-      // Determine coordinates relative to the stage
-      const rect = stage.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      const x = clientX - rect.left;
-      const y = clientY - rect.top;
+        function openPanel(){
+          // ölç ve sabit yükseklik ver
+          panel.style.display = 'block';
+          const inner = panel.querySelector('.answer-inner');
+          const fullH = inner.getBoundingClientRect().height + 24; // padding toleransı
+          panel.style.height = fullH + 'px';
+          panel.classList.add('open');
+          panel.setAttribute('aria-hidden','false');
+          btn.setAttribute('aria-expanded','true');
+          btn.textContent = 'Gizle';
+        }
+        function closePanel(){
+          panel.style.height = panel.querySelector('.answer-inner').getBoundingClientRect().height + 'px';
+          // küçük gecikme ile 0 yap
+          requestAnimationFrame(()=> {
+            panel.style.height = '0px';
+          });
+          panel.classList.remove('open');
+          panel.setAttribute('aria-hidden','true');
+          btn.setAttribute('aria-expanded','false');
+          btn.textContent = 'Göster';
+          // sonunda display none
+          setTimeout(()=> panel.style.display = '', 750);
+        }
 
-      let text = input.value.trim();
-      if(!text) text = defaultText;
+        btn.addEventListener('click', ()=>{
+          const expanded = btn.getAttribute('aria-expanded') === 'true';
+          if(expanded) closePanel(); else openPanel();
+        });
+      });
 
-      // Basic safety check: refuse to display explicitly hateful slurs that target protected groups.
-      const lowered = text.toLowerCase();
-      const hatefulWords = ['siktir', 'orospu', 'ibne', 'mal', 'fuck', 'bitch']; // minimal filter for common slurs
-      if(hatefulWords.some(w => lowered.includes(w))){
-        spawnText(x, y, 'metin uygun değil');
-        return;
-      }
+      // "Tümünü Aç/Kapat" butonu
+      const expandAll = document.getElementById('expandAll');
+      expandAll.addEventListener('click', ()=> {
+        const anyClosed = toggles.some(b => b.getAttribute('aria-expanded') !== 'true');
+        toggles.forEach(b => {
+          const target = document.getElementById(b.getAttribute('aria-controls'));
+          if(anyClosed){
+            // open all
+            if(b.getAttribute('aria-expanded') !== 'true') b.click();
+          } else {
+            // close all
+            if(b.getAttribute('aria-expanded') === 'true') b.click();
+          }
+        });
+      });
 
-      spawnText(x, y, text);
-    }
+      // İnteraktif küçük dokunuş: logo tıklanınca ilk soruyu aç/kapa
+      const logo = document.querySelector('.logo');
+      logo.addEventListener('click', ()=> {
+        const firstBtn = toggles[0];
+        if(firstBtn) firstBtn.click();
+        logo.animate([{ transform:'scale(1)' }, { transform:'scale(1.06)' }, { transform:'scale(1)' }], { duration:700, easing:'cubic-bezier(.18,.77,.32,1)' });
+      });
 
-    // Support clicks and touches
-    stage.addEventListener('click', handlePointer);
-    stage.addEventListener('touchstart', (e)=>{ e.preventDefault(); handlePointer(e); }, {passive:false});
-
-    // Clear button to remove all floating texts
-    clearBtn.addEventListener('click', ()=>{
-      defaultText = '';
-      input.value = '';
-      // remove any leftover floating nodes
-      stage.querySelectorAll('.floating-text').forEach(n=>n.remove());
-    });
-
-    // Keyboard: spacebar will spawn text at center (useful for desktop testing)
-    document.addEventListener('keydown', (e)=>{
-      if(e.code === 'Space'){
-        const rect = stage.getBoundingClientRect();
-        spawnText(rect.width/2, rect.height/2, input.value.trim() || defaultText);
-      }
-    });
-
-    // Focus stage for keyboard
-    stage.addEventListener('keydown', ()=>{});
-  </script></body>
+      // erişilebilirlik: focus sırası
+      document.querySelectorAll('.btn, [role="switch"]').forEach(el => el.setAttribute('tabindex','0'));
+    })();
+  </script>
+</body>
 </html>

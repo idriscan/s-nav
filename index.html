@@ -1,426 +1,874 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Din Kültürü Çalışma Kartı</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #eef2f5;
-            --card-bg: #ffffff;
-            --text-primary: #333333;
-            --text-secondary: #666666;
-            --accent-color: #4f46e5; /* İndigo Mavisi */
-            --accent-hover: #4338ca;
-            --border-color: #e5e7eb;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            --radius: 16px;
-            --transition: all 0.3s ease;
-        }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Din Kültürü — Modlu Çalışma & Sınav (Fix)</title>
 
-        /* Karanlık Mod Değişkenleri */
-        body.dark-mode {
-            --bg-color: #111827;
-            --card-bg: #1f2937;
-            --text-primary: #f3f4f6;
-            --text-secondary: #9ca3af;
-            --accent-color: #6366f1;
-            --border-color: #374151;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-        }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
+<style>
+:root{
+  --bg: linear-gradient(135deg,#667eea,#764ba2);
+  --card: rgba(255,255,255,.18);
+  --text: #fff;
+  --muted: rgba(255,255,255,.8);
+  --btn: rgba(255,255,255,.26);
+  --active: rgba(255,255,255,.38);
+  --accent: #ffd166;
+  --dim: rgba(0,0,0,0.28);
+  --danger: rgba(255,90,90,0.95);
+}
+body.light{
+  --bg: linear-gradient(135deg,#e0eafc,#cfdef3);
+  --card: rgba(255,255,255,.95);
+  --text:#222;
+  --muted:#444;
+  --btn: rgba(0,0,0,.08);
+  --active: rgba(0,0,0,.12);
+  --dim: rgba(255,255,255,0.18);
+}
+*{box-sizing:border-box;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;}
+html,body{height:100%;margin:0}
+body{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--bg);
+  color:var(--text);
+  padding:20px;
+}
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            transition: var(--transition);
-            padding: 20px;
-        }
+/* Container: limit height so content doesn't push pop-up off-screen */
+.container{
+  width:100%;
+  max-width:980px;
+  background:var(--card);
+  border-radius:18px;
+  padding:0; /* settings is sticky inside */
+  box-shadow:0 30px 60px rgba(0,0,0,.25);
+  backdrop-filter: blur(12px);
+  position:relative;
+  max-height:calc(100vh - 40px);
+  overflow:auto; /* scroll inside container when content grows */
+  display:flex;
+  flex-direction:column;
+}
 
-        /* Ana Kart (Pop-up) */
-        .main-card {
-            background-color: var(--card-bg);
-            width: 100%;
-            max-width: 600px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            max-height: 90vh; /* Ekranın %90'ı kadar uzunluk */
-        }
+/* dim overlay used in focus mode */
+.dim-overlay{
+  pointer-events:none;
+  position:absolute;
+  inset:0;
+  background:transparent;
+  transition:background .25s ease;
+  border-radius:18px;
+  z-index:5;
+}
 
-        /* Üst Başlık ve Ayarlar */
-        .header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            z-index: 10;
-        }
+/* SETTINGS - sticky so it doesn't move when content grows */
+.settings{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  padding:14px;
+  background:var(--card);
+  position:sticky;
+  top:0;
+  z-index:20;
+  border-top-left-radius:18px;
+  border-top-right-radius:18px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+}
+.settings button, .small-btn{
+  background:var(--btn);
+  color:var(--text);
+  border:0;
+  padding:9px 12px;
+  border-radius:12px;
+  cursor:pointer;
+  font-size:14px;
+}
+.mode-btn.active{
+  background:var(--active);
+  box-shadow:inset 0 4px 10px rgba(0,0,0,.08);
+  border:1px solid rgba(0,0,0,.04);
+}
 
-        .header h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
+/* questions list area: scrollable if content large */
+.content{
+  padding:16px;
+  overflow:auto;
+}
 
-        .settings-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            color: var(--text-secondary);
-            transition: var(--transition);
-        }
+/* Study questions */
+.questions{margin-top:6px}
+.question{
+  background: rgba(255,255,255,.10);
+  border-radius:12px;
+  padding:14px;
+  margin-bottom:12px;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, opacity .18s ease, border-color .12s ease;
+  position:relative;
+  z-index:1;
+  border:2px solid transparent;
+}
+.question:hover{transform:translateY(-4px); box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.question.blur{filter:blur(4px); opacity:.75}
+.question h4{margin:0 0 8px;font-size:16px}
+.answer{max-height:0;overflow:hidden;opacity:0;transition:all .35s ease}
+.answer.open{max-height:600px;opacity:1}
+.q-actions{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
 
-        .settings-btn:hover {
-            background-color: var(--bg-color);
-            color: var(--accent-color);
-        }
+/* reveal button progress bar */
+.reveal-btn{
+  position:relative;
+  overflow:hidden;
+}
+.reveal-progress{
+  position:absolute;
+  left:0; top:0; bottom:0;
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+  transition:width .1s linear;
+  z-index:0;
+}
+.reveal-btn > * { position:relative; z-index:1; }
 
-        /* İlerleme Çubuğu */
-        .progress-container {
-            height: 4px;
-            background-color: var(--bg-color);
-            width: 100%;
-        }
-        .progress-bar {
-            height: 100%;
-            background-color: var(--accent-color);
-            width: 0%;
-            transition: width 0.5s ease;
-        }
+/* self-eval after revealing (game) */
+.self-eval{
+  margin-top:8px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.eval-btn{
+  padding:8px 10px;
+  border-radius:10px;
+  border:0;
+  background:var(--btn);
+  color:var(--text);
+  cursor:pointer;
+}
 
-        /* Ayarlar Menüsü (Pop-up içinde Pop-up) */
-        .settings-menu {
-            position: absolute;
-            top: 60px;
-            right: 20px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            width: 250px;
-            padding: 15px;
-            display: none; /* Varsayılan gizli */
-            flex-direction: column;
-            gap: 12px;
-            z-index: 20;
-            animation: slideDown 0.2s ease-out;
-        }
+/* wrong flash animation */
+@keyframes wrongFlash {
+  0% { box-shadow: 0 0 0 0 rgba(255,90,90,0.0); border-color: rgba(255,90,90,0.0); }
+  20% { box-shadow: 0 0 0 6px rgba(255,90,90,0.12); border-color: var(--danger); }
+  100% { box-shadow: 0 0 0 0 rgba(255,90,90,0.0); border-color: transparent; }
+}
+.question.wrong{
+  animation: wrongFlash .9s ease forwards;
+  border-color: var(--danger);
+}
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+/* toast for badges / messages */
+.toast{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  background:rgba(0,0,0,.85);
+  color:#fff;
+  padding:10px 14px;
+  border-radius:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+  opacity:0;
+  transform:translateY(8px);
+  transition:all .35s ease;
+  z-index:9999;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.toast.show{opacity:1; transform:translateY(0)}
+.toast .badge{
+  background:var(--accent);
+  padding:6px 8px;
+  border-radius:8px;
+  color:#000;
+  font-weight:700;
+}
 
-        .settings-menu.active {
-            display: flex;
-        }
+/* Exam UI */
+.screen{display:none}
+.screen.active{display:block}
 
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
+.exam-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.timer{font-weight:600}
+.progress{opacity:.9}
 
-        /* Toggle Switch */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-        }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--accent-color); }
-        input:checked + .slider:before { transform: translateX(20px); }
+.mcq-card{
+  background: rgba(255,255,255,.06);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:12px;
+}
+.options{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.option{
+  border-radius:10px;
+  padding:10px 12px;
+  background:rgba(255,255,255,.08);
+  cursor:pointer;
+  border:2px solid transparent;
+}
+.option.selected{outline:0;border-color: rgba(255,255,255,.22)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.big-btn{
+  flex:1;
+  padding:12px 14px;
+  border-radius:12px;
+  border:0;
+  background:var(--btn);
+  color:var(--text);
+  cursor:pointer;
+}
+.result-list{margin-top:12px}
+.result-item{
+  background:rgba(255,255,255,.06);
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:8px;
+}
 
-        /* Butonlar */
-        .action-btn {
-            padding: 8px 12px;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            color: var(--text-primary);
-            transition: var(--transition);
-            width: 100%;
-            text-align: center;
-        }
-        .action-btn:hover {
-            background-color: var(--border-color);
-        }
+/* status bar */
+.statusbar{
+  margin-top:8px;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  font-size:14px;
+  opacity:.95;
+  padding:12px 16px;
+  border-top:1px solid rgba(0,0,0,.04);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  border-bottom-left-radius:18px;
+  border-bottom-right-radius:18px;
+}
+.status-left{display:flex;gap:10px;align-items:center}
+.score-badge{
+  background:var(--accent);
+  color:#000;
+  padding:6px 10px;
+  border-radius:12px;
+  font-weight:600;
+}
 
-        /* İçerik Alanı */
-        .content {
-            padding: 20px;
-            overflow-y: auto; /* Scroll edilebilir */
-            flex-grow: 1;
-        }
-
-        .question-card {
-            background-color: var(--bg-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            border: 1px solid transparent;
-            transition: var(--transition);
-        }
-
-        .question-card:hover {
-            border-color: var(--accent-color);
-        }
-
-        .question-text {
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 12px;
-            line-height: 1.5;
-        }
-
-        .toggle-answer-btn {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .toggle-answer-btn:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .answer-area {
-            margin-top: 0;
-            max-height: 0;
-            overflow: hidden;
-            opacity: 0;
-            transition: all 0.4s ease-in-out;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            border-top: 1px solid transparent;
-        }
-
-        .answer-area.visible {
-            margin-top: 15px;
-            max-height: 500px; /* Yeterince büyük bir değer */
-            opacity: 1;
-            border-top: 1px solid var(--border-color);
-            padding-top: 10px;
-        }
-
-        /* Yazı Boyutu Slider */
-        .range-slider {
-            width: 100%;
-            accent-color: var(--accent-color);
-        }
-
-    </style>
+/* Responsive */
+@media (max-width:720px){
+  .settings{gap:6px}
+  .statusbar{font-size:13px}
+}
+</style>
 </head>
 <body>
 
-    <div class="main-card">
-        <div class="header">
-            <h2>📜 Sınav Çalışma Kartı</h2>
-            <button class="settings-btn" id="settingsToggle" title="Hızlı Ayarlar">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            </button>
-        </div>
+<div class="container" id="appContainer">
+  <div class="dim-overlay" id="dimOverlay"></div>
 
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
+  <!-- SETTINGS (sticky) -->
+  <div class="settings" id="topSettings">
+    <button class="small-btn" onclick="toggleTheme()">🌙 / ☀️</button>
 
-        <div class="settings-menu" id="settingsMenu">
-            <div class="setting-item">
-                <span>Karanlık Mod</span>
-                <label class="switch">
-                    <input type="checkbox" id="darkModeToggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span>Yazı Boyutu</span>
-                <input type="range" min="14" max="24" value="16" class="range-slider" id="fontSizeSlider">
-            </div>
-            <hr style="border: 0; border-top: 1px solid var(--border-color);">
-            <button class="action-btn" id="expandAllBtn">Tüm Cevapları Göster</button>
-            <button class="action-btn" id="collapseAllBtn">Tümünü Gizle</button>
-        </div>
+    <!-- MOD BUTONLARI -->
+    <button class="small-btn mode-btn" data-mode="think" onclick="toggleMode('think', this)">🧠 Düşün (5s)</button>
+    <button class="small-btn mode-btn" data-mode="game" onclick="toggleMode('game', this)">🎮 Oyun</button>
+    <button class="small-btn mode-btn" data-mode="focus" onclick="toggleMode('focus', this)">👁️ Odak</button>
 
-        <div class="content" id="questionsContainer">
-            </div>
+    <button class="small-btn" onclick="openExamSetup()">📝 Sınav Modu (Kurulum)</button>
+    <button class="small-btn" onclick="openAll()">📂 Tümünü Aç</button>
+    <button class="small-btn" onclick="closeAll()">📁 Tümünü Kapat</button>
+    <button class="small-btn" onclick="toggleStarOnly()">⭐ Sadece İşaretliler</button>
+  </div>
+
+  <!-- MAIN CONTENT (scrolls inside container) -->
+  <div class="content">
+
+    <!-- STUDY SCREEN -->
+    <div id="studyScreen" class="screen active">
+      <div id="questions" class="questions"></div>
     </div>
 
-    <script>
-        // Soru ve Cevap Verileri (Orta Uzunlukta Hazırlandı)
-        const questions = [
-            {
-                q: "1. Dünya hayatının amacı nedir?",
-                a: "Dünya hayatı, ahiret için bir hazırlık ve imtihan yeridir. İnsanın yaratılış amacı; Allah’ı tanımak, O’na iman etmek ve emirlerini yerine getirerek O'na kulluk etmektir."
-            },
-            {
-                q: "2. Ahiret hayatına iman etmek insana nasıl bir davranış kazandırır?",
-                a: "Ahiret inancı insana sorumluluk bilinci kazandırır. Kişi, yaptıklarının hesabını vereceğini bildiği için kötülüklerden kaçınır, adaletli olur ve zorluklar karşısında sabırlı davranır."
-            },
-            {
-                q: "3. Kur'an'a göre Hz. Muhammed (s.a.v.) nasıl bir insandır?",
-                a: "Kur'an'a göre o, Allah'tan vahiy alan bir peygamberdir. Ancak aynı zamanda yiyip içen, insani duygulara sahip bir 'beşer'dir (insan). O, alemlere rahmet olarak gönderilmiştir."
-            },
-            {
-                q: "4. Hz. Muhammed'in (s.a.v.) en önemli bir ahlaki özelliğini yazınız.",
-                a: "En belirgin özelliği 'El-Emîn' yani güvenilir olmasıdır. Peygamberimiz her zaman sözünde durur, asla yalan söylemez ve emanetleri korurdu."
-            },
-            {
-                q: "5. 'Üsve-i hasene' ne demektir?",
-                a: "Kelime anlamı 'en güzel örnek' demektir. Müslümanlar için Hz. Muhammed'in hayatı, sözleri ve ahlakıyla takip edilmesi gereken mükemmel bir model olduğunu ifade eder."
-            }
-        ];
+    <!-- EXAM SETUP -->
+    <div id="examSetup" class="screen">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0">
+        <div>⏱️ Sınav Süresi (saniye):</div>
+        <input id="examDuration" type="number" min="30" value="120" style="padding:8px 10px;border-radius:10px;border:none;width:120px">
+        <div style="font-size:13px;color:var(--muted)">Minimum 30 sn. (Varsayılan 120 sn)</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button class="small-btn" onclick="startExamFromSetup()">Sınavı Başlat</button>
+        <button class="small-btn" onclick="cancelExamSetup()">İptal</button>
+      </div>
+    </div>
 
-        const container = document.getElementById('questionsContainer');
-        const progressBar = document.getElementById('progressBar');
-        const settingsMenu = document.getElementById('settingsMenu');
-        const settingsToggle = document.getElementById('settingsToggle');
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const fontSizeSlider = document.getElementById('fontSizeSlider');
-        let openCount = 0;
+    <!-- EXAM SCREEN -->
+    <div id="examScreen" class="screen">
+      <div class="exam-top">
+        <div>
+          <div style="font-weight:600" id="examTitle">📝 Çoktan Seçmeli Sınav</div>
+          <div class="progress" id="examProgress"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="timer" id="timerDisplay">00:00</div>
+          <div style="font-size:13px;opacity:.9">Kalan süre</div>
+        </div>
+      </div>
 
-        // Soruları Ekrana Basma Fonksiyonu
-        function renderQuestions() {
-            container.innerHTML = '';
-            questions.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = 'question-card';
-                
-                card.innerHTML = `
-                    <div class="question-text">${item.q}</div>
-                    <button class="toggle-answer-btn" onclick="toggleAnswer(this)">
-                        <span>👁️</span> Cevabı Gör
-                    </button>
-                    <div class="answer-area">${item.a}</div>
-                `;
-                container.appendChild(card);
-            });
+      <div class="mcq-card">
+        <div id="examQuestion" style="font-weight:600"></div>
+        <div id="options" class="options"></div>
+      </div>
+
+      <div class="nav">
+        <button class="big-btn" onclick="prevQuestion()">◀ Geri</button>
+        <button class="big-btn" onclick="nextQuestion()">İleri ▶</button>
+        <button class="big-btn" onclick="finishExam()">Sınavı Bitir</button>
+      </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="resultScreen" class="screen">
+      <h2 style="margin-top:6px">📝 Sınav Sonucu</h2>
+      <p id="resultSummary"></p>
+      <div id="detailedResults" class="result-list"></div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="small-btn" onclick="retryExam()">Tekrar Çöz</button>
+        <button class="small-btn" onclick="exitExam()">Çalışma Moduna Dön</button>
+      </div>
+    </div>
+
+  </div> <!-- /content -->
+
+  <!-- STATUS BAR (bottom inside container) -->
+  <div class="statusbar" aria-hidden="false">
+    <div class="status-left">
+      <div style="font-weight:600">Modlar:</div>
+      <div id="modeList">—</div>
+    </div>
+    <div>
+      <span class="score-badge" id="scoreBadge">Puan: 0 • Seri: 0</span>
+    </div>
+  </div>
+
+</div> <!-- /container -->
+
+<!-- toast -->
+<div id="toast" class="toast"><div class="badge">🏅</div><div id="toastText">Rozet!</div></div>
+
+<script>
+/* ========== DATA ========== */
+const data = [
+  {
+    q: "1. Dünya hayatının amacı nedir?",
+    a: "Dünya hayatı, ahiret için bir hazırlık ve imtihan yeridir. İnsanın yaratılış amacı; Allah’ı tanımak, O’na iman etmek ve O'nun emirlerini yerine getirerek kulluk etmektir.",
+    options: [
+      { key: "A", text: "Sadece dünyevi zevkler için yaşamak." },
+      { key: "B", text: "Ahiret için bir hazırlık ve imtihan yeridir." },
+      { key: "C", text: "Sadece bilim ve teknolojiyi geliştirmek." },
+      { key: "D", text: "Toplum içinde statü kazanmak." }
+    ],
+    correct: "B"
+  },
+  {
+    q: "2. Ahiret hayatına iman etmek insana nasıl bir davranış kazandırır?",
+    a: "Ahiret inancı, insana sorumluluk bilinci kazandırır. Kişi, yaptıklarının hesabını vereceğini bildiği için kötülüklerden kaçınır, adaletli olur ve hayatın zorlukları karşısında sabırlı davranır.",
+    options: [
+      { key: "A", text: "Sorumluluk bilinci kazandırır." },
+      { key: "B", text: "İnsanları umursamaz yapar." },
+      { key: "C", text: "Sadece ritüellerle meşgul eder." },
+      { key: "D", text: "Toplumsal kuralları önemsiz kılar." }
+    ],
+    correct: "A"
+  },
+  {
+    q: "3. Kur'an'a göre Hz. Muhammed (s.a.v.) nasıl bir insandır?",
+    a: "Kur'an'a göre o, Allah'tan vahiy alan bir peygamber olmakla birlikte, diğer insanlar gibi yiyip içen, üzülen veya sevinen bir insandır (beşer). O, bizden biri ve alemlere rahmet olarak gönderilmiştir.",
+    options: [
+      { key: "A", text: "Sadece ilahi bir varlık, insan değil." },
+      { key: "B", text: "Vahiy alan bir peygamber ve aynı zamanda beşerdir." },
+      { key: "C", text: "Efsanevi, gerçek olmayan bir figür." },
+      { key: "D", text: "Sadece siyasal bir lider." }
+    ],
+    correct: "B"
+  },
+  {
+    q: "4. Hz. Muhammed'in (s.a.v.) en önemli bir ahlaki özelliğini yazınız.",
+    a: "En belirgin özelliği güvenilir (El-Emîn) olmasıdır. Peygamberimiz sözünde durur, asla yalan söylemez ve kendisine emanet edilen şeyleri korurdu.",
+    options: [
+      { key: "A", text: "Zenginlik" },
+      { key: "B", text: "Savaşçılık" },
+      { key: "C", text: "Güvenilir olması (El-Emîn)." },
+      { key: "D", text: "Sadece akademik bilgisi" }
+    ],
+    correct: "C"
+  },
+  {
+    q: "5. \"Üsve-i hasene\" ne demektir?",
+    a: "Kelime anlamı \"en güzel örnek\" demektir. Müslümanlar için Hz. Muhammed'in (s.a.v.) hayatı, sözleri ve davranışlarıyla takip edilmesi gereken mükemmel bir model olduğunu ifade eder.",
+    options: [
+      { key: "A", text: "En güzel örnek." },
+      { key: "B", text: "En kutsal kitap." },
+      { key: "C", text: "Bir ibadet türü." },
+      { key: "D", text: "Tarihsel bir bölge adı." }
+    ],
+    correct: "A"
+  }
+];
+
+/* ========== STATE & PERSISTENCE ========== */
+let modes = { think:false, game:false, focus:false };
+let starOnly = false;
+let score = 0, streak = 0;
+
+/* theme persistence */
+function loadTheme(){
+  const t = localStorage.getItem('dk_theme');
+  if(t === 'light') document.body.classList.add('light');
+  else document.body.classList.remove('light');
+}
+function saveTheme(){
+  localStorage.setItem('dk_theme', document.body.classList.contains('light') ? 'light' : 'dark');
+}
+
+/* load other persisted state */
+function loadState(){
+  try{
+    const ms = JSON.parse(localStorage.getItem('dk_modes'));
+    if(ms) modes = ms;
+    const s = JSON.parse(localStorage.getItem('dk_score'));
+    if(s){ score = s.score||0; streak = s.streak||0; }
+    const so = JSON.parse(localStorage.getItem('dk_starOnly'));
+    if(typeof so === 'boolean') starOnly = so;
+  }catch(e){}
+}
+function saveState(){
+  localStorage.setItem('dk_modes', JSON.stringify(modes));
+  localStorage.setItem('dk_score', JSON.stringify({score,streak}));
+  localStorage.setItem('dk_starOnly', JSON.stringify(starOnly));
+}
+
+/* ========== RENDER STUDY ========== */
+const questionsEl = document.getElementById('questions');
+const dimOverlay = document.getElementById('dimOverlay');
+const toastEl = document.getElementById('toast');
+const toastText = document.getElementById('toastText');
+
+function escapeHtml(text){ return text.replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+function renderStudy(){
+  questionsEl.innerHTML = '';
+  data.forEach((item, idx) => {
+    const qWrap = document.createElement('div');
+    qWrap.className = 'question';
+    qWrap.dataset.index = idx;
+    qWrap.innerHTML = `
+      <h4>${item.q} <span class="star" style="color:gold;display:none">⭐</span></h4>
+      <div class="answer">${escapeHtml(item.a)}</div>
+      <div class="q-actions">
+        <button class="small-btn reveal-btn" onclick="toggleAnswer(this)"><span class="reveal-progress"></span><span class="reveal-text">Cevabı Göster</span></button>
+        <button class="small-btn" onclick="toggleStar(this)">⭐ Önemli</button>
+      </div>
+      <div class="self-eval" style="display:none">
+        <div style="font-size:13px;opacity:.9">Sen doğru buldun mu?</div>
+        <button class="eval-btn" onclick="selfEval(${idx}, true)">Biliyordum</button>
+        <button class="eval-btn" onclick="selfEval(${idx}, false)">Yanlış</button>
+      </div>
+    `;
+    questionsEl.appendChild(qWrap);
+  });
+
+  // restore mode buttons
+  document.querySelectorAll('.mode-btn').forEach(b=>{
+    const m = b.dataset.mode;
+    if(modes[m]) b.classList.add('active'); else b.classList.remove('active');
+  });
+
+  filterStars();
+  updateModeList();
+  updateScoreBadge();
+}
+
+/* load saved state and render */
+loadTheme();
+loadState();
+renderStudy();
+
+/* ========== INTERACTIONS ========== */
+
+function toggleTheme(){
+  document.body.classList.toggle('light');
+  saveTheme();
+}
+function toggleMode(mode, btnEl){
+  modes[mode] = !modes[mode];
+  document.querySelectorAll('.mode-btn').forEach(b=>{
+    const m = b.dataset.mode;
+    if(modes[m]) b.classList.add('active'); else b.classList.remove('active');
+  });
+  // if turning off focus remove blur/dim
+  if(mode === 'focus' && !modes.focus){
+    document.querySelectorAll('.question').forEach(q=>q.classList.remove('blur'));
+    dimOverlay.style.background = 'transparent';
+  }
+  updateModeList();
+  saveState();
+}
+
+/* toggle answer with think/progress and focus/game handling */
+function toggleAnswer(btn){
+  const question = btn.closest('.question');
+  const ans = question.querySelector('.answer');
+  const selfEvalDiv = question.querySelector('.self-eval');
+
+  const revealAction = ()=>{
+    const isOpen = ans.classList.toggle('open');
+    const txt = btn.querySelector('.reveal-text');
+    if(isOpen) txt.innerText = 'Gizle'; else txt.innerText = 'Cevabı Göster';
+
+    // game mode behavior
+    if(modes.game && isOpen){
+      selfEvalDiv.style.display = 'flex';
+      delete ans.dataset.scored; // allow scoring for this open
+    } else {
+      selfEvalDiv.style.display = 'none';
+    }
+
+    // focus behavior
+    if(modes.focus){
+      document.querySelectorAll('.question').forEach(q=>{
+        if(q !== question){
+          if(isOpen) q.classList.add('blur'); else q.classList.remove('blur');
         }
+      });
+      dimOverlay.style.background = isOpen ? 'var(--dim)' : 'transparent';
+    }
+    saveState();
+  };
 
-        // Cevap Açma/Kapama Fonksiyonu
-        window.toggleAnswer = function(btn) {
-            const answerDiv = btn.nextElementSibling;
-            const isVisible = answerDiv.classList.contains('visible');
-            
-            if (isVisible) {
-                answerDiv.classList.remove('visible');
-                btn.innerHTML = '<span>👁️</span> Cevabı Gör';
-                btn.style.backgroundColor = 'var(--accent-color)';
-            } else {
-                answerDiv.classList.add('visible');
-                btn.innerHTML = '<span>❌</span> Gizle';
-                btn.style.backgroundColor = '#666';
-            }
-            updateProgress();
-        };
+  // if think mode and not already open => start progress
+  if(modes.think && !ans.classList.contains('open')){
+    const progressEl = btn.querySelector('.reveal-progress');
+    const textEl = btn.querySelector('.reveal-text');
+    btn.disabled = true;
+    let t = 5000; // ms
+    const step = 100; // ms
+    progressEl.style.width = '0%';
+    textEl.innerText = 'Bekleyin 5s';
+    const iv = setInterval(()=>{
+      t -= step;
+      const pct = Math.max(0, (5000 - t) / 50); // 0-100
+      progressEl.style.width = `${Math.min(100, pct)}%`;
+      textEl.innerText = `Bekleyin ${Math.ceil(t/1000)}s`;
+      if(t <= 0){
+        clearInterval(iv);
+        progressEl.style.width = '100%';
+        btn.disabled = false;
+        textEl.innerText = 'Cevabı Göster';
+        // small delay to let progress show 100%
+        setTimeout(()=>{ progressEl.style.width = '0%'; revealAction(); }, 150);
+      }
+    }, step);
+  } else {
+    revealAction();
+  }
+}
 
-        // İlerleme Çubuğunu Güncelleme
-        function updateProgress() {
-            const total = document.querySelectorAll('.answer-area').length;
-            const visible = document.querySelectorAll('.answer-area.visible').length;
-            const percentage = (visible / total) * 100;
-            progressBar.style.width = percentage + '%';
-        }
+/* self-eval for game mode */
+function selfEval(index, correct){
+  const q = document.querySelector(`.question[data-index="${index}"]`);
+  if(!q) return;
+  const ans = q.querySelector('.answer');
 
-        // Ayarlar Menüsünü Aç/Kapat
-        settingsToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            settingsMenu.classList.toggle('active');
-        });
+  if(correct){
+    if(!ans.dataset.scored){
+      score += 10;
+      streak += 1;
+      ans.dataset.scored = '1';
+      updateScoreBadge();
+      saveState();
+      if([3,5,10].includes(streak)){
+        showBadge(`Rozet kazandın! Seri: ${streak}`);
+      } else {
+        showToast('Puan eklendi!');
+      }
+    } else {
+      showToast('Bu açılış için zaten puan aldın.');
+    }
+  } else {
+    // wrong: flash red and reset streak
+    streak = 0;
+    updateScoreBadge();
+    saveState();
+    q.classList.add('wrong');
+    setTimeout(()=> q.classList.remove('wrong'), 900);
+    showToast('Yanlış işaretlendi — seri sıfırlandı.');
+  }
+  // hide self-eval after evaluation
+  q.querySelector('.self-eval').style.display = 'none';
+}
 
-        // Menü dışına tıklanırsa kapat
-        document.addEventListener('click', (e) => {
-            if (!settingsMenu.contains(e.target) && !settingsToggle.contains(e.target)) {
-                settingsMenu.classList.remove('active');
-            }
-        });
+/* star / filter */
+function toggleStar(btn){
+  const q = btn.closest('.question');
+  const star = q.querySelector('.star');
+  q.classList.toggle('starred');
+  star.style.display = q.classList.contains('starred') ? 'inline' : 'none';
+  filterStars();
+  saveState();
+}
+function toggleStarOnly(){ starOnly = !starOnly; filterStars(); saveState(); updateModeList(); }
+function filterStars(){
+  document.querySelectorAll('.question').forEach(q=>{
+    if(starOnly && !q.classList.contains('starred')) q.style.display = 'none';
+    else q.style.display = '';
+  });
+}
 
-        // Karanlık Mod
-        darkModeToggle.addEventListener('change', (e) => {
-            document.body.classList.toggle('dark-mode', e.target.checked);
-        });
+/* open/close all */
+function openAll(){
+  document.querySelectorAll('.answer').forEach(a=>a.classList.add('open'));
+  document.querySelectorAll('.reveal-btn .reveal-text').forEach(t=>t.innerText='Gizle');
+  if(modes.game) document.querySelectorAll('.self-eval').forEach(d=>d.style.display='flex');
+  // keep container visible at top (settings sticky); scroll to top of container
+  const container = document.querySelector('.container');
+  container.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function closeAll(){
+  document.querySelectorAll('.answer').forEach(a=>a.classList.remove('open'));
+  document.querySelectorAll('.reveal-btn .reveal-text').forEach(t=>t.innerText='Cevabı Göster');
+  document.querySelectorAll('.self-eval').forEach(d=>d.style.display='none');
+  document.querySelectorAll('.question').forEach(q=>q.classList.remove('blur'));
+  dimOverlay.style.background = 'transparent';
+}
 
-        // Tümünü Aç
-        document.getElementById('expandAllBtn').addEventListener('click', () => {
-            document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
-                const answerDiv = btn.nextElementSibling;
-                if (!answerDiv.classList.contains('visible')) {
-                    toggleAnswer(btn);
-                }
-            });
-        });
+/* toast helpers */
+let toastTimer = null;
+function showToast(text, timeout=1600){
+  clearTimeout(toastTimer);
+  toastText.innerText = text;
+  toastEl.classList.add('show');
+  toastTimer = setTimeout(()=> toastEl.classList.remove('show'), timeout);
+}
+function showBadge(text, timeout=2600){
+  clearTimeout(toastTimer);
+  toastEl.querySelector('.badge').style.display = 'inline-block';
+  toastText.innerText = text;
+  toastEl.classList.add('show');
+  toastTimer = setTimeout(()=> {
+    toastEl.classList.remove('show');
+    toastEl.querySelector('.badge').style.display = 'none';
+  }, timeout);
+}
 
-        // Tümünü Kapat
-        document.getElementById('collapseAllBtn').addEventListener('click', () => {
-            document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
-                const answerDiv = btn.nextElementSibling;
-                if (answerDiv.classList.contains('visible')) {
-                    toggleAnswer(btn);
-                }
-            });
-        });
+/* update UI mode list & score */
+function updateModeList(){
+  const parts = [];
+  if(modes.think) parts.push('Düşün(5s)');
+  if(modes.game) parts.push('Oyun');
+  if(modes.focus) parts.push('Odak');
+  if(starOnly) parts.push('Sadece⭐');
+  document.getElementById('modeList').innerText = parts.length ? parts.join(' · ') : '—';
+  updateScoreBadge();
+}
+function updateScoreBadge(){
+  document.getElementById('scoreBadge').innerText = `Puan: ${score} • Seri: ${streak}`;
+}
 
-        // Yazı Boyutu Ayarı
-        fontSizeSlider.addEventListener('input', (e) => {
-            const size = e.target.value + 'px';
-            document.querySelectorAll('.question-text').forEach(el => el.style.fontSize = size);
-            document.querySelectorAll('.answer-area').forEach(el => el.style.fontSize = (parseInt(e.target.value) - 1) + 'px');
-        });
+/* save initial UI state */
+updateModeList();
+updateScoreBadge();
 
-        // Başlat
-        renderQuestions();
+/* ========== EXAM MODE (fixed navigation/visibility) ========== */
+let examState = {
+  active: false,
+  duration: 120,
+  remaining: 0,
+  timerId: null,
+  index: 0,
+  answers: Array(data.length).fill(null),
+  startedAt: null,
+  finished: false
+};
 
-    </script>
+const studyScreen = document.getElementById('studyScreen');
+const examSetup = document.getElementById('examSetup');
+const examScreen = document.getElementById('examScreen');
+const resultScreen = document.getElementById('resultScreen');
+
+/* showScreen now handles examSetup as a screen too */
+function showScreen(id){
+  // remove active from all .screen inside content
+  document.querySelectorAll('.content .screen').forEach(s=>s.classList.remove('active'));
+  if(id === 'studyScreen' || id === ''){
+    document.getElementById('studyScreen').classList.add('active');
+    // scroll to top so settings remain visible
+    document.querySelector('.container').scrollTo({ top: 0, behavior: 'smooth' });
+  } else if(id === 'examSetup'){
+    document.getElementById('examSetup').classList.add('active');
+    // scroll down to show setup area
+    document.querySelector('.container').scrollTo({ top: document.querySelector('.container').scrollHeight, behavior:'smooth' });
+  } else if(id === 'examScreen'){
+    document.getElementById('examScreen').classList.add('active');
+    document.querySelector('.container').scrollTo({ top: 0, behavior: 'smooth' });
+  } else if(id === 'resultScreen'){
+    document.getElementById('resultScreen').classList.add('active');
+    document.querySelector('.container').scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    document.getElementById('studyScreen').classList.add('active');
+  }
+}
+
+/* open / cancel setup use showScreen */
+function openExamSetup(){
+  showScreen('examSetup');
+}
+function cancelExamSetup(){
+  showScreen('studyScreen');
+}
+
+/* start exam */
+function startExamFromSetup(){
+  const val = parseInt(document.getElementById('examDuration').value, 10);
+  examState.duration = isNaN(val) || val < 30 ? 120 : val;
+  startExam();
+}
+
+function startExam(){
+  examState.active = true;
+  examState.remaining = examState.duration;
+  examState.index = 0;
+  examState.answers = Array(data.length).fill(null);
+  examState.startedAt = Date.now();
+  examState.finished = false;
+  showScreen('examScreen');
+  renderExam();
+  startTimer();
+}
+
+/* timer & exam rendering */
+function startTimer(){
+  stopTimer();
+  updateTimerDisplay();
+  examState.timerId = setInterval(()=>{
+    examState.remaining--;
+    if(examState.remaining <= 0){
+      stopTimer();
+      autoFinishExam();
+    }
+    updateTimerDisplay();
+  },1000);
+}
+function stopTimer(){
+  if(examState.timerId) { clearInterval(examState.timerId); examState.timerId = null; }
+}
+function updateTimerDisplay(){
+  const d = examState.remaining;
+  const m = Math.floor(d/60).toString().padStart(2,'0');
+  const s = (d%60).toString().padStart(2,'0');
+  document.getElementById('timerDisplay').innerText = `${m}:${s}`;
+}
+function renderExam(){
+  const idx = examState.index;
+  const item = data[idx];
+  document.getElementById('examQuestion').innerText = item.q;
+  document.getElementById('examProgress').innerText = `Soru ${idx+1} / ${data.length}`;
+  const optsEl = document.getElementById('options');
+  optsEl.innerHTML = '';
+  item.options.forEach(opt=>{
+    const div = document.createElement('div');
+    div.className = 'option' + (examState.answers[idx]===opt.key ? ' selected' : '');
+    div.dataset.key = opt.key;
+    div.innerHTML = `<strong style="margin-right:8px">${opt.key}.</strong> ${escapeHtml(opt.text)}`;
+    div.onclick = ()=> {
+      selectOption(opt.key);
+      document.querySelectorAll('#options .option').forEach(o=>o.classList.remove('selected'));
+      div.classList.add('selected');
+    };
+    optsEl.appendChild(div);
+  });
+}
+function selectOption(key){
+  examState.answers[examState.index] = key;
+}
+function prevQuestion(){ if(examState.index > 0){ examState.index--; renderExam(); } }
+function nextQuestion(){ if(examState.index < data.length - 1){ examState.index++; renderExam(); } }
+function finishExam(){ if(!examState.finished){ stopTimer(); examState.finished = true; showResults(); } }
+function autoFinishExam(){ examState.finished = true; showResults(true); }
+
+/* results */
+function showResults(timeOut=false){
+  examState.active = false;
+  showScreen('resultScreen');
+  let correctCount = 0;
+  const details = data.map((item, i) => {
+    const user = examState.answers[i];
+    const ok = user === item.correct;
+    if(ok) correctCount++;
+    return {
+      q: item.q,
+      correct: item.correct,
+      user,
+      ok,
+      aText: item.a,
+      correctText: item.options.find(o=>o.key===item.correct).text
+    };
+  });
+
+  const scorePerc = Math.round((correctCount / data.length) * 100);
+  const timeUsed = examState.duration - examState.remaining;
+  const took = `${Math.floor(timeUsed/60)}m ${timeUsed%60}s`;
+  document.getElementById('resultSummary').innerText =
+    `${correctCount} / ${data.length} doğru — Başarı: ${scorePerc}%\nSüre: ${took}` + (timeOut ? " (Süre doldu)" : "");
+
+  const detEl = document.getElementById('detailedResults');
+  detEl.innerHTML = '';
+  details.forEach((d,i)=>{
+    const div = document.createElement('div');
+    div.className = 'result-item';
+    div.innerHTML = `
+      <strong>${i+1}. ${d.q}</strong>
+      <div style="margin-top:6px">${escapeHtml(d.aText)}</div>
+      <div style="margin-top:8px">
+        <div><strong>Doğru cevap:</strong> ${d.correct} — ${escapeHtml(d.correctText)}</div>
+        <div><strong>Sizin cevabınız:</strong> ${d.user ? d.user + ' — ' + escapeHtml( (data[i].options.find(o=>o.key===d.user)||{text:'-' }).text) : 'Cevap verilmedi'}</div>
+        <div style="margin-top:6px;color:${d.ok? 'lightgreen':'#ffb3b3'}"><strong>${d.ok? 'Doğru':'Yanlış'}</strong></div>
+      </div>
+    `;
+    detEl.appendChild(div);
+  });
+}
+
+/* retry & exit */
+function retryExam(){
+  examState = {
+    active:false, duration: examState.duration || 120, remaining: 0, timerId:null, index:0, answers: [], startedAt:null, finished:false
+  };
+  showScreen('examSetup');
+}
+function exitExam(){
+  stopTimer();
+  examState.active=false;
+  showScreen('studyScreen');
+}
+
+/* keyboard nav for exam */
+document.addEventListener('keydown', (e)=>{ 
+  if(document.getElementById('examScreen').classList.contains('active')){
+    if(e.key === 'ArrowRight') nextQuestion();
+    if(e.key === 'ArrowLeft') prevQuestion();
+  }
+});
+
+/* persist state on unload */
+window.addEventListener('beforeunload', ()=> {
+  saveState();
+  saveTheme();
+});
+</script>
+
 </body>
 </html>

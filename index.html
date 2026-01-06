@@ -1,481 +1,426 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sağlık Çalışma Sayfası — İnteraktif</title>
-  <meta name="description" content="Sağlık konuları — karanlık/aydınlık tema, yavaş animasyonlu interaktif sayfa.">
-  <style>
-    /* --- Temel değişkenler (light / dark için üzerine yazılıyor) --- */
-    :root{
-      --bg: #fffbf7;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --accent: #7c3aed;
-      --accent-2: #06b6d4;
-      --glass: rgba(255,255,255,0.6);
-      --shadow: 0 8px 24px rgba(16,24,40,0.06);
-      --radius: 14px;
-      --transition-fast: 280ms cubic-bezier(.2,.9,.2,1);
-      --transition-slow: 700ms cubic-bezier(.18,.77,.32,1); /* tatlı ve yavaş */
-      --focus-ring: 3px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Din Kültürü Çalışma Kartı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #eef2f5;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --accent-color: #4f46e5; /* İndigo Mavisi */
+            --accent-hover: #4338ca;
+            --border-color: #e5e7eb;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
 
-    [data-theme="dark"]{
-      --bg: #0b1020;
-      --card: rgba(9,12,20,0.7);
-      --text: #eef2ff;
-      --muted: #9aa4bf;
-      --accent: #9f7aea;
-      --accent-2: #34d3e0;
-      --glass: rgba(255,255,255,0.03);
-      --shadow: 0 10px 30px rgba(2,6,23,0.6);
-    }
+        /* Karanlık Mod Değişkenleri */
+        body.dark-mode {
+            --bg-color: #111827;
+            --card-bg: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-color: #6366f1;
+            --border-color: #374151;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
 
-    /* --- Genel sayfa --- */
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.06), transparent),
-                  radial-gradient(900px 500px at 90% 90%, rgba(6,182,212,0.04), transparent),
-                  var(--bg);
-      color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:32px;
-      transition: background var(--transition-slow), color var(--transition-slow);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
 
-    .container{
-      width:100%;
-      max-width:900px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
-      backdrop-filter: blur(6px) saturate(120%);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      transition: background var(--transition-slow), box-shadow var(--transition-slow);
-    }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: var(--transition);
+            padding: 20px;
+        }
 
-    [data-theme="dark"] .container{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    }
+        /* Ana Kart (Pop-up) */
+        .main-card {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh; /* Ekranın %90'ı kadar uzunluk */
+        }
 
-    header{
-      display:flex;
-      gap:16px;
-      align-items:center;
-      justify-content:space-between;
-      padding:28px 32px;
-    }
+        /* Üst Başlık ve Ayarlar */
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            z-index: 10;
+        }
 
-    .brand{
-      display:flex;
-      gap:14px;
-      align-items:center;
-    }
+        .header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
 
-    .logo{
-      width:56px;
-      height:56px;
-      border-radius:12px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:white;
-      font-weight:700;
-      font-size:20px;
-      box-shadow:0 6px 20px rgba(124,58,237,0.18);
-      transition:transform var(--transition-slow);
-    }
-    .logo:active{ transform: scale(0.98) }
+        .settings-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
 
-    h1{
-      margin:0;
-      font-size:18px;
-      letter-spacing: -0.2px;
-    }
-    p.lead{ margin:4px 0 0 0; color:var(--muted); font-size:13px }
+        .settings-btn:hover {
+            background-color: var(--bg-color);
+            color: var(--accent-color);
+        }
 
-    /* --- Kontroller --- */
-    .controls{
-      display:flex;
-      gap:12px;
-      align-items:center;
-    }
-    .btn{
-      border:0;
-      background:var(--card);
-      padding:8px 12px;
-      border-radius:12px;
-      box-shadow: 0 6px 18px rgba(2,6,23,0.06);
-      cursor:pointer;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-slow);
-      font-weight:600;
-      color:var(--text);
-    }
-    .btn:focus{ outline: none; box-shadow: 0 0 0 var(--focus-ring) rgba(124,58,237,0.12) }
+        /* İlerleme Çubuğu */
+        .progress-container {
+            height: 4px;
+            background-color: var(--bg-color);
+            width: 100%;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
 
-    .toggle{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:6px;
-    }
-    .switch{
-      width:46px;
-      height:28px;
-      background:var(--glass);
-      border-radius:999px;
-      position:relative;
-      padding:4px;
-      cursor:pointer;
-      transition: background var(--transition-slow);
-    }
-    .knob{
-      width:20px;
-      height:20px;
-      background:linear-gradient(180deg,white,rgba(255,255,255,0.9));
-      border-radius:50%;
-      box-shadow:0 6px 14px rgba(2,6,23,0.12);
-      transform: translateX(0);
-      transition: transform var(--transition-slow), background var(--transition-slow);
-    }
-    [data-theme="dark"] .knob{
-      background:linear-gradient(180deg,#111,#1b1f2a);
-    }
-    .switch.on{ background: linear-gradient(90deg,var(--accent),var(--accent-2)); }
-    .switch.on .knob{ transform: translateX(18px) }
+        /* Ayarlar Menüsü (Pop-up içinde Pop-up) */
+        .settings-menu {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            width: 250px;
+            padding: 15px;
+            display: none; /* Varsayılan gizli */
+            flex-direction: column;
+            gap: 12px;
+            z-index: 20;
+            animation: slideDown 0.2s ease-out;
+        }
 
-    /* --- İçerik alanı --- */
-    main{
-      padding:18px 32px 36px 32px;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:14px;
-    }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    .card{
-      background: linear-gradient(180deg,var(--card), rgba(255,255,255,0.02));
-      border-radius:12px;
-      padding:14px;
-      box-shadow: 0 6px 18px rgba(2,6,23,0.04);
-      transition: transform var(--transition-slow), box-shadow var(--transition-slow);
-      overflow:visible;
-    }
-    .card header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-    }
-    .qnum{
-      display:inline-grid;
-      place-items:center;
-      width:44px;
-      height:44px;
-      border-radius:10px;
-      background:linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.02));
-      color:var(--text);
-      font-weight:700;
-      font-size:15px;
-    }
+        .settings-menu.active {
+            display: flex;
+        }
 
-    .question-title{ margin:0; font-size:15px; font-weight:700 }
-    .muted{ color:var(--muted); font-size:13px; margin-top:6px }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
 
-    /* --- Akordeon (cevap) --- */
-    .answer{
-      margin-top:12px;
-      height:0;
-      overflow:hidden;
-      transition: height var(--transition-slow) ease;
-    }
-    .answer.open{
-      height:auto; /* fallback; we will set explicit height in JS for smoothness */
-    }
-    .answer-inner{
-      padding:12px 8px;
-      border-radius:10px;
-      background: linear-gradient(180deg, rgba(124,58,237,0.04), rgba(6,182,212,0.02));
-      color:var(--text);
-      font-size:15px;
-      line-height:1.5;
-      transition: opacity var(--transition-slow);
-    }
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent-color); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
-    /* küçük ekranlarda biraz daralt */
-    @media (max-width:560px){
-      body{ padding:16px }
-      .container{ border-radius:12px }
-      header{ padding:20px }
-      main{ padding:16px }
-    }
+        /* Butonlar */
+        .action-btn {
+            padding: 8px 12px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            transition: var(--transition);
+            width: 100%;
+            text-align: center;
+        }
+        .action-btn:hover {
+            background-color: var(--border-color);
+        }
 
-    /* tatlı hover efektleri */
-    .card:hover{ transform: translateY(-6px) }
-    .card:active{ transform: translateY(-2px) }
+        /* İçerik Alanı */
+        .content {
+            padding: 20px;
+            overflow-y: auto; /* Scroll edilebilir */
+            flex-grow: 1;
+        }
 
-    /* küçük not */
-    .footer-note{
-      font-size:13px;
-      color:var(--muted);
-      text-align:center;
-      padding:12px 18px;
-    }
+        .question-card {
+            background-color: var(--bg-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
 
-  </style>
+        .question-card:hover {
+            border-color: var(--accent-color);
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .toggle-answer-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .toggle-answer-btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .answer-area {
+            margin-top: 0;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.4s ease-in-out;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            border-top: 1px solid transparent;
+        }
+
+        .answer-area.visible {
+            margin-top: 15px;
+            max-height: 500px; /* Yeterince büyük bir değer */
+            opacity: 1;
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+        }
+
+        /* Yazı Boyutu Slider */
+        .range-slider {
+            width: 100%;
+            accent-color: var(--accent-color);
+        }
+
+    </style>
 </head>
 <body>
-  <div class="container" id="app">
-    <header>
-      <div class="brand">
-        <div class="logo" aria-hidden="true">SÇ</div>
-        <div>
-          <h1>SAĞLIK ÇALIŞMA SAYFASI</h1>
-          <p class="lead">Sorular + kısa cevaplar — interaktif, karanlık/aydınlık tema</p>
+
+    <div class="main-card">
+        <div class="header">
+            <h2>📜 Sınav Çalışma Kartı</h2>
+            <button class="settings-btn" id="settingsToggle" title="Hızlı Ayarlar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>
         </div>
-      </div>
 
-      <div class="controls" role="group" aria-label="Tema ve kontrol düğmeleri">
-        <button class="btn" id="expandAll" title="Tümünü Aç / Kapat">Tümünü Aç/Kapat</button>
-
-        <div class="toggle" aria-hidden="false">
-          <span class="sr-only" style="position:absolute;left:-9999px">Tema</span>
-          <div id="themeSwitch" class="switch" role="switch" tabindex="0" aria-checked="false" aria-label="Karanlık temayı aç veya kapat">
-            <div class="knob"></div>
-          </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
         </div>
-      </div>
-    </header>
 
-    <main>
-      <div class="grid" id="qaList">
-        <!-- Q1 -->
-        <article class="card">
-          <header>
-            <div style="display:flex;gap:12px;align-items:center">
-              <div class="qnum">1</div>
-              <div>
-                <p class="question-title">1. Soru — Sağlık nedir? Tanımlayınız.</p>
-                <p class="muted">Cevap (kısa):</p>
-              </div>
+        <div class="settings-menu" id="settingsMenu">
+            <div class="setting-item">
+                <span>Karanlık Mod</span>
+                <label class="switch">
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="slider"></span>
+                </label>
             </div>
-            <button class="btn toggleAnswer" aria-expanded="false" aria-controls="a1">Göster</button>
-          </header>
-
-          <div id="a1" class="answer" aria-hidden="true">
-            <div class="answer-inner">
-              Yalnızca hasta ve engelli olmama hâli değildir; <strong>bedenen, zihnen, ruhsal ve sosyal yönden iyilik durumudur.</strong>
+            <div class="setting-item">
+                <span>Yazı Boyutu</span>
+                <input type="range" min="14" max="24" value="16" class="range-slider" id="fontSizeSlider">
             </div>
-          </div>
-        </article>
+            <hr style="border: 0; border-top: 1px solid var(--border-color);">
+            <button class="action-btn" id="expandAllBtn">Tüm Cevapları Göster</button>
+            <button class="action-btn" id="collapseAllBtn">Tümünü Gizle</button>
+        </div>
 
-        <!-- Q2 -->
-        <article class="card">
-          <header>
-            <div style="display:flex;gap:12px;align-items:center">
-              <div class="qnum">2</div>
-              <div>
-                <p class="question-title">2. Soru — Engel türlerini yazınız.</p>
-                <p class="muted">Cevap (liste):</p>
-              </div>
+        <div class="content" id="questionsContainer">
             </div>
-            <button class="btn toggleAnswer" aria-expanded="false" aria-controls="a2">Göster</button>
-          </header>
-
-          <div id="a2" class="answer" aria-hidden="true">
-            <div class="answer-inner">
-              1. Görme engeli<br>
-              2. İşitsel engel<br>
-              3. Spastik engel<br>
-              4. Fiziksel engel<br>
-              5. Zihinsel engel<br>
-              6. Dil ve konuşma engeli
-            </div>
-          </div>
-        </article>
-
-        <!-- Q3 -->
-        <article class="card">
-          <header>
-            <div style="display:flex;gap:12px;align-items:center">
-              <div class="qnum">3</div>
-              <div>
-                <p class="question-title">3. Soru — İnsan sağlığını etkileyen temel etmenler yazınız.</p>
-                <p class="muted">Cevap (liste):</p>
-              </div>
-            </div>
-            <button class="btn toggleAnswer" aria-expanded="false" aria-controls="a3">Göster</button>
-          </header>
-
-          <div id="a3" class="answer" aria-hidden="true">
-            <div class="answer-inner">
-              1. Çevresel etmenler<br>
-              2. Genetik etmenler<br>
-              3. Sağlık hizmetleri<br>
-              4. Yaşam şekli ve sosyoekonomik durum
-            </div>
-          </div>
-        </article>
-
-        <!-- Q4 -->
-        <article class="card">
-          <header>
-            <div style="display:flex;gap:12px;align-items:center">
-              <div class="qnum">4</div>
-              <div>
-                <p class="question-title">4. Soru — İnsan sağlığını etkileyen çevresel etmenleri yazınız.</p>
-                <p class="muted">Cevap (kısa):</p>
-              </div>
-            </div>
-            <button class="btn toggleAnswer" aria-expanded="false" aria-controls="a4">Göster</button>
-          </header>
-
-          <div id="a4" class="answer" aria-hidden="true">
-            <div class="answer-inner">
-              Biyolojik, fiziksel ve kimyasal etmenler.
-            </div>
-          </div>
-        </article>
-
-        <!-- Q5 -->
-        <article class="card">
-          <header>
-            <div style="display:flex;gap:12px;align-items:center">
-              <div class="qnum">5</div>
-              <div>
-                <p class="question-title">5. Soru — Sağlık hizmetleri nelerdir?</p>
-                <p class="muted">Cevap (sınıflama):</p>
-              </div>
-            </div>
-            <button class="btn toggleAnswer" aria-expanded="false" aria-controls="a5">Göster</button>
-          </header>
-
-          <div id="a5" class="answer" aria-hidden="true">
-            <div class="answer-inner">
-              1. Koruyucu sağlık hizmetleri<br>
-              2. Tedavi edici sağlık hizmetleri<br>
-              3. Rehabilitasyon sağlık hizmetleri
-            </div>
-          </div>
-        </article>
-
-      </div>
-    </main>
-
-    <div class="footer-note">
-      İstersen bu dosyayı kaydet ve öğretmene göster — tema tarayıcıya kaydedilir.
     </div>
-  </div>
 
-  <script>
-    /* --- Tema yönetimi --- */
-    (function(){
-      const root = document.documentElement;
-      const app = document.getElementById('app');
-      const switchEl = document.getElementById('themeSwitch');
-      const KNOB_CLASS_ON = 'on';
+    <script>
+        // Soru ve Cevap Verileri (Orta Uzunlukta Hazırlandı)
+        const questions = [
+            {
+                q: "1. Dünya hayatının amacı nedir?",
+                a: "Dünya hayatı, ahiret için bir hazırlık ve imtihan yeridir. İnsanın yaratılış amacı; Allah’ı tanımak, O’na iman etmek ve emirlerini yerine getirerek O'na kulluk etmektir."
+            },
+            {
+                q: "2. Ahiret hayatına iman etmek insana nasıl bir davranış kazandırır?",
+                a: "Ahiret inancı insana sorumluluk bilinci kazandırır. Kişi, yaptıklarının hesabını vereceğini bildiği için kötülüklerden kaçınır, adaletli olur ve zorluklar karşısında sabırlı davranır."
+            },
+            {
+                q: "3. Kur'an'a göre Hz. Muhammed (s.a.v.) nasıl bir insandır?",
+                a: "Kur'an'a göre o, Allah'tan vahiy alan bir peygamberdir. Ancak aynı zamanda yiyip içen, insani duygulara sahip bir 'beşer'dir (insan). O, alemlere rahmet olarak gönderilmiştir."
+            },
+            {
+                q: "4. Hz. Muhammed'in (s.a.v.) en önemli bir ahlaki özelliğini yazınız.",
+                a: "En belirgin özelliği 'El-Emîn' yani güvenilir olmasıdır. Peygamberimiz her zaman sözünde durur, asla yalan söylemez ve emanetleri korurdu."
+            },
+            {
+                q: "5. 'Üsve-i hasene' ne demektir?",
+                a: "Kelime anlamı 'en güzel örnek' demektir. Müslümanlar için Hz. Muhammed'in hayatı, sözleri ve ahlakıyla takip edilmesi gereken mükemmel bir model olduğunu ifade eder."
+            }
+        ];
 
-      // Başlangıç: localStorage veya tercih
-      const saved = localStorage.getItem('saglik_theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const initialDark = saved ? (saved === 'dark') : prefersDark;
+        const container = document.getElementById('questionsContainer');
+        const progressBar = document.getElementById('progressBar');
+        const settingsMenu = document.getElementById('settingsMenu');
+        const settingsToggle = document.getElementById('settingsToggle');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const fontSizeSlider = document.getElementById('fontSizeSlider');
+        let openCount = 0;
 
-      function setTheme(dark){
-        if(dark){
-          root.setAttribute('data-theme','dark');
-          switchEl.classList.add(KNOB_CLASS_ON);
-          switchEl.setAttribute('aria-checked','true');
-        }else{
-          root.removeAttribute('data-theme');
-          switchEl.classList.remove(KNOB_CLASS_ON);
-          switchEl.setAttribute('aria-checked','false');
-        }
-        localStorage.setItem('saglik_theme', dark ? 'dark' : 'light');
-      }
-
-      setTheme(initialDark);
-
-      // tıklama / klavye ile kontrol
-      switchEl.addEventListener('click', ()=> setTheme(!root.hasAttribute('data-theme')));
-      switchEl.addEventListener('keydown', (e)=> {
-        if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTheme(!root.hasAttribute('data-theme')); }
-      });
-
-      // Expand / collapse her bir akordeon
-      const toggles = Array.from(document.querySelectorAll('.toggleAnswer'));
-      toggles.forEach(btn => {
-        const targetId = btn.getAttribute('aria-controls');
-        const panel = document.getElementById(targetId);
-
-        function openPanel(){
-          // ölç ve sabit yükseklik ver
-          panel.style.display = 'block';
-          const inner = panel.querySelector('.answer-inner');
-          const fullH = inner.getBoundingClientRect().height + 24; // padding toleransı
-          panel.style.height = fullH + 'px';
-          panel.classList.add('open');
-          panel.setAttribute('aria-hidden','false');
-          btn.setAttribute('aria-expanded','true');
-          btn.textContent = 'Gizle';
-        }
-        function closePanel(){
-          panel.style.height = panel.querySelector('.answer-inner').getBoundingClientRect().height + 'px';
-          // küçük gecikme ile 0 yap
-          requestAnimationFrame(()=> {
-            panel.style.height = '0px';
-          });
-          panel.classList.remove('open');
-          panel.setAttribute('aria-hidden','true');
-          btn.setAttribute('aria-expanded','false');
-          btn.textContent = 'Göster';
-          // sonunda display none
-          setTimeout(()=> panel.style.display = '', 750);
+        // Soruları Ekrana Basma Fonksiyonu
+        function renderQuestions() {
+            container.innerHTML = '';
+            questions.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                
+                card.innerHTML = `
+                    <div class="question-text">${item.q}</div>
+                    <button class="toggle-answer-btn" onclick="toggleAnswer(this)">
+                        <span>👁️</span> Cevabı Gör
+                    </button>
+                    <div class="answer-area">${item.a}</div>
+                `;
+                container.appendChild(card);
+            });
         }
 
-        btn.addEventListener('click', ()=>{
-          const expanded = btn.getAttribute('aria-expanded') === 'true';
-          if(expanded) closePanel(); else openPanel();
+        // Cevap Açma/Kapama Fonksiyonu
+        window.toggleAnswer = function(btn) {
+            const answerDiv = btn.nextElementSibling;
+            const isVisible = answerDiv.classList.contains('visible');
+            
+            if (isVisible) {
+                answerDiv.classList.remove('visible');
+                btn.innerHTML = '<span>👁️</span> Cevabı Gör';
+                btn.style.backgroundColor = 'var(--accent-color)';
+            } else {
+                answerDiv.classList.add('visible');
+                btn.innerHTML = '<span>❌</span> Gizle';
+                btn.style.backgroundColor = '#666';
+            }
+            updateProgress();
+        };
+
+        // İlerleme Çubuğunu Güncelleme
+        function updateProgress() {
+            const total = document.querySelectorAll('.answer-area').length;
+            const visible = document.querySelectorAll('.answer-area.visible').length;
+            const percentage = (visible / total) * 100;
+            progressBar.style.width = percentage + '%';
+        }
+
+        // Ayarlar Menüsünü Aç/Kapat
+        settingsToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsMenu.classList.toggle('active');
         });
-      });
 
-      // "Tümünü Aç/Kapat" butonu
-      const expandAll = document.getElementById('expandAll');
-      expandAll.addEventListener('click', ()=> {
-        const anyClosed = toggles.some(b => b.getAttribute('aria-expanded') !== 'true');
-        toggles.forEach(b => {
-          const target = document.getElementById(b.getAttribute('aria-controls'));
-          if(anyClosed){
-            // open all
-            if(b.getAttribute('aria-expanded') !== 'true') b.click();
-          } else {
-            // close all
-            if(b.getAttribute('aria-expanded') === 'true') b.click();
-          }
+        // Menü dışına tıklanırsa kapat
+        document.addEventListener('click', (e) => {
+            if (!settingsMenu.contains(e.target) && !settingsToggle.contains(e.target)) {
+                settingsMenu.classList.remove('active');
+            }
         });
-      });
 
-      // İnteraktif küçük dokunuş: logo tıklanınca ilk soruyu aç/kapa
-      const logo = document.querySelector('.logo');
-      logo.addEventListener('click', ()=> {
-        const firstBtn = toggles[0];
-        if(firstBtn) firstBtn.click();
-        logo.animate([{ transform:'scale(1)' }, { transform:'scale(1.06)' }, { transform:'scale(1)' }], { duration:700, easing:'cubic-bezier(.18,.77,.32,1)' });
-      });
+        // Karanlık Mod
+        darkModeToggle.addEventListener('change', (e) => {
+            document.body.classList.toggle('dark-mode', e.target.checked);
+        });
 
-      // erişilebilirlik: focus sırası
-      document.querySelectorAll('.btn, [role="switch"]').forEach(el => el.setAttribute('tabindex','0'));
-    })();
-  </script>
+        // Tümünü Aç
+        document.getElementById('expandAllBtn').addEventListener('click', () => {
+            document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
+                const answerDiv = btn.nextElementSibling;
+                if (!answerDiv.classList.contains('visible')) {
+                    toggleAnswer(btn);
+                }
+            });
+        });
+
+        // Tümünü Kapat
+        document.getElementById('collapseAllBtn').addEventListener('click', () => {
+            document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
+                const answerDiv = btn.nextElementSibling;
+                if (answerDiv.classList.contains('visible')) {
+                    toggleAnswer(btn);
+                }
+            });
+        });
+
+        // Yazı Boyutu Ayarı
+        fontSizeSlider.addEventListener('input', (e) => {
+            const size = e.target.value + 'px';
+            document.querySelectorAll('.question-text').forEach(el => el.style.fontSize = size);
+            document.querySelectorAll('.answer-area').forEach(el => el.style.fontSize = (parseInt(e.target.value) - 1) + 'px');
+        });
+
+        // Başlat
+        renderQuestions();
+
+    </script>
 </body>
 </html>

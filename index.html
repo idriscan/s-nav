@@ -269,11 +269,9 @@ body{
 <div class="container" id="appContainer">
   <div class="dim-overlay" id="dimOverlay"></div>
 
-  <!-- SETTINGS (sticky) -->
   <div class="settings" id="topSettings">
     <button class="small-btn" onclick="toggleTheme()">🌙 / ☀️</button>
 
-    <!-- MOD BUTONLARI -->
     <button class="small-btn mode-btn" data-mode="think" onclick="toggleMode('think', this)">🧠 Düşün (5s)</button>
     <button class="small-btn mode-btn" data-mode="game" onclick="toggleMode('game', this)">🎮 Oyun</button>
     <button class="small-btn mode-btn" data-mode="focus" onclick="toggleMode('focus', this)">👁️ Odak</button>
@@ -284,15 +282,12 @@ body{
     <button class="small-btn" onclick="toggleStarOnly()">⭐ Sadece İşaretliler</button>
   </div>
 
-  <!-- MAIN CONTENT (scrolls inside container) -->
   <div class="content">
 
-    <!-- STUDY SCREEN -->
     <div id="studyScreen" class="screen active">
       <div id="questions" class="questions"></div>
     </div>
 
-    <!-- EXAM SETUP -->
     <div id="examSetup" class="screen">
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0">
         <div>⏱️ Sınav Süresi (saniye):</div>
@@ -305,7 +300,6 @@ body{
       </div>
     </div>
 
-    <!-- EXAM SCREEN -->
     <div id="examScreen" class="screen">
       <div class="exam-top">
         <div>
@@ -330,7 +324,6 @@ body{
       </div>
     </div>
 
-    <!-- RESULT SCREEN -->
     <div id="resultScreen" class="screen">
       <h2 style="margin-top:6px">📝 Sınav Sonucu</h2>
       <p id="resultSummary"></p>
@@ -341,10 +334,7 @@ body{
       </div>
     </div>
 
-  </div> <!-- /content -->
-
-  <!-- STATUS BAR (bottom inside container) -->
-  <div class="statusbar" aria-hidden="false">
+  </div> <div class="statusbar" aria-hidden="false">
     <div class="status-left">
       <div style="font-weight:600">Modlar:</div>
       <div id="modeList">—</div>
@@ -354,17 +344,15 @@ body{
     </div>
   </div>
 
-</div> <!-- /container -->
-
-<!-- toast -->
-<div id="toast" class="toast"><div class="badge">🏅</div><div id="toastText">Rozet!</div></div>
+</div> <div id="toast" class="toast"><div class="badge">🏅</div><div id="toastText">Rozet!</div></div>
 
 <script>
-/* ========== DATA ========== */
+/* ========== DATA (KISALTILMIŞ CEVAPLAR) ========== */
 const data = [
   {
     q: "1. Dünya hayatının amacı nedir?",
-    a: "Dünya hayatı, ahiret için bir hazırlık ve imtihan yeridir. İnsanın yaratılış amacı; Allah’ı tanımak, O’na iman etmek ve O'nun emirlerini yerine getirerek kulluk etmektir.",
+    // Eski: Uzun paragraf...
+    a: "Ahiret için bir imtihan yeridir. Amaç; Allah'ı tanımak ve O'na kulluk etmektir.",
     options: [
       { key: "A", text: "Sadece dünyevi zevkler için yaşamak." },
       { key: "B", text: "Ahiret için bir hazırlık ve imtihan yeridir." },
@@ -375,7 +363,8 @@ const data = [
   },
   {
     q: "2. Ahiret hayatına iman etmek insana nasıl bir davranış kazandırır?",
-    a: "Ahiret inancı, insana sorumluluk bilinci kazandırır. Kişi, yaptıklarının hesabını vereceğini bildiği için kötülüklerden kaçınır, adaletli olur ve hayatın zorlukları karşısında sabırlı davranır.",
+    // Eski: Uzun paragraf...
+    a: "Sorumluluk bilinci kazandırır. Hesap verme inancıyla insanı kötülükten uzak tutar.",
     options: [
       { key: "A", text: "Sorumluluk bilinci kazandırır." },
       { key: "B", text: "İnsanları umursamaz yapar." },
@@ -386,7 +375,8 @@ const data = [
   },
   {
     q: "3. Kur'an'a göre Hz. Muhammed (s.a.v.) nasıl bir insandır?",
-    a: "Kur'an'a göre o, Allah'tan vahiy alan bir peygamber olmakla birlikte, diğer insanlar gibi yiyip içen, üzülen veya sevinen bir insandır (beşer). O, bizden biri ve alemlere rahmet olarak gönderilmiştir.",
+    // Eski: Uzun paragraf...
+    a: "Hem vahiy alan bir Peygamber, hem de insani özellikleri olan bir beşerdir.",
     options: [
       { key: "A", text: "Sadece ilahi bir varlık, insan değil." },
       { key: "B", text: "Vahiy alan bir peygamber ve aynı zamanda beşerdir." },
@@ -397,7 +387,8 @@ const data = [
   },
   {
     q: "4. Hz. Muhammed'in (s.a.v.) en önemli bir ahlaki özelliğini yazınız.",
-    a: "En belirgin özelliği güvenilir (El-Emîn) olmasıdır. Peygamberimiz sözünde durur, asla yalan söylemez ve kendisine emanet edilen şeyleri korurdu.",
+    // Eski: Uzun paragraf...
+    a: "El-Emîn (Güvenilir) olmasıdır. Asla yalan söylemez, emaneti korurdu.",
     options: [
       { key: "A", text: "Zenginlik" },
       { key: "B", text: "Savaşçılık" },
@@ -408,7 +399,8 @@ const data = [
   },
   {
     q: "5. \"Üsve-i hasene\" ne demektir?",
-    a: "Kelime anlamı \"en güzel örnek\" demektir. Müslümanlar için Hz. Muhammed'in (s.a.v.) hayatı, sözleri ve davranışlarıyla takip edilmesi gereken mükemmel bir model olduğunu ifade eder.",
+    // Eski: Uzun paragraf...
+    a: "\"En güzel örnek\" demektir. Peygamberimizin bizim için en mükemmel model olmasıdır.",
     options: [
       { key: "A", text: "En güzel örnek." },
       { key: "B", text: "En kutsal kitap." },
